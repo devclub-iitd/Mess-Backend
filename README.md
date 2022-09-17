@@ -1,3 +1,70 @@
+## Data Models
+
+#### Admin
+- kerberos
+- password_hash
+- name
+- access ("root", "manager", "worker", "secy")
+
+#### User
+- Kerberos
+- Name
+- Photo
+- Hostel # TODO: Object?
+
+#### AccessToken
+- User_id
+- token
+- created_time
+- isActive
+- scope ("full")
+
+#### RawMaterial
+- name
+- vendors: ["", ""]
+
+#### FoodItem
+- name
+- raw_materials[]
+
+#### MealMenu
+- Mess # TODO: Object?
+- start_time
+- end_time
+- capacity
+- fooditem_ids[]
+- price
+
+#### MealToken
+- User_id
+- MealMenu_id
+- BookStatus ("issued", "used")
+- Enter_Timing
+
+## Endpoints
+
+### auth
+#### login
+#### createAdmin
+
+### worker
+#### verifyToken
+#### getProfile
+#### uploadPhoto
+#### getMealTokens
+#### useMealToken
+
+### manager
+#### createRawMaterial
+#### createFoodItem
+#### createMealMenu
+#### issueMealToken
+
+### api
+#### getMealMenus
+#### getMealTokens
+#### reports/...
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
