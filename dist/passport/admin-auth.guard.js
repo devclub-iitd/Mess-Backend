@@ -6,26 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.AdminAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
 const passport_1 = require("@nestjs/passport");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
-const auth_module_1 = require("./auth/auth.module");
-const config_1 = require("./config");
-let AppModule = class AppModule {
+let AdminAuthGuard = class AdminAuthGuard extends (0, passport_1.AuthGuard)() {
+    canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        if (!request.session || !request.session.user) {
+            throw new common_1.UnauthorizedException('Please login');
+        }
+        return true;
+    }
 };
-AppModule = __decorate([
-    (0, common_1.Module)({
-        imports: [
-            mongoose_1.MongooseModule.forRoot(config_1.default.MONGODB_STRING),
-            auth_module_1.AuthModule,
-            passport_1.PassportModule,
-        ],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
-    })
-], AppModule);
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+AdminAuthGuard = __decorate([
+    (0, common_1.Injectable)()
+], AdminAuthGuard);
+exports.AdminAuthGuard = AdminAuthGuard;
+//# sourceMappingURL=admin-auth.guard.js.map

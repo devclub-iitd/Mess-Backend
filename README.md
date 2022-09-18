@@ -47,6 +47,8 @@ TODO: implement inventory, keep track of how much raw material left
 
 ### auth
 #### login
+#### logout
+#### myProfile
 #### createAdmin
 
 ### staff
