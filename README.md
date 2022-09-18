@@ -4,7 +4,7 @@
 - kerberos
 - password_hash
 - name
-- access ("root", "manager", "worker", "secy")
+- access ("root", "manager", "staff", "secy")
 
 #### User
 - Kerberos
@@ -23,11 +23,13 @@
 - name
 - vendors: ["", ""]
 
+TODO: implement inventory, keep track of how much raw material left
+
 #### FoodItem
 - name
 - raw_materials[]
 
-#### MealMenu
+#### Meal
 - Mess # TODO: Object?
 - start_time
 - end_time
@@ -37,7 +39,7 @@
 
 #### MealToken
 - User_id
-- MealMenu_id
+- Meal_id
 - BookStatus ("issued", "used")
 - Enter_Timing
 
@@ -47,7 +49,7 @@
 #### login
 #### createAdmin
 
-### worker
+### staff
 #### verifyToken
 #### getProfile
 #### uploadPhoto
