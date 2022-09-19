@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Meal } from './meal.schema';
 import { User } from './user.schema';
@@ -25,3 +25,6 @@ export class MealToken {
   @Prop()
   enter_time: Date;
 }
+
+export type MealTokenDocument = MealToken & Document;
+export const MealTokenSchema = SchemaFactory.createForClass(MealToken);

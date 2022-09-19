@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MealToken = void 0;
+exports.MealTokenSchema = exports.MealToken = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const meal_schema_1 = require("./meal.schema");
@@ -44,4 +44,5 @@ MealToken = __decorate([
     (0, mongoose_1.Schema)()
 ], MealToken);
 exports.MealToken = MealToken;
+exports.MealTokenSchema = mongoose_1.SchemaFactory.createForClass(MealToken);
 //# sourceMappingURL=mealtoken.schema.js.map

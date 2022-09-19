@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { FoodItem } from './fooditem.schema';
 
@@ -6,6 +6,9 @@ import { FoodItem } from './fooditem.schema';
 export class Meal {
   @Prop()
   mess: string;
+
+  @Prop({ default: 'Meal' })
+  name: string;
 
   @Prop({ required: true })
   start_time: Date;
@@ -25,3 +28,6 @@ export class Meal {
   })
   fooditem_ids: FoodItem[];
 }
+
+export type MealDocument = Meal & Document;
+export const MealSchema = SchemaFactory.createForClass(Meal);

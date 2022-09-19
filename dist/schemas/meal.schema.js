@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Meal = void 0;
+exports.MealSchema = exports.Meal = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Meal = class Meal {
@@ -18,6 +18,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Meal.prototype, "mess", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'Meal' }),
+    __metadata("design:type", String)
+], Meal.prototype, "name", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Date)
@@ -45,4 +49,5 @@ Meal = __decorate([
     (0, mongoose_1.Schema)()
 ], Meal);
 exports.Meal = Meal;
+exports.MealSchema = mongoose_1.SchemaFactory.createForClass(Meal);
 //# sourceMappingURL=meal.schema.js.map

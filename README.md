@@ -59,10 +59,14 @@ TODO: implement inventory, keep track of how much raw material left
 #### useMealToken
 
 ### manager
-#### createRawMaterial
-#### createFoodItem
-#### createMealMenu
-#### issueMealToken
+#### createUser
+#### createAccessToken
+#### getAccessToken
+#### createRawMaterial (TODO)
+#### createFoodItem (TODO)
+#### createMeal
+#### getMeals
+#### createMealToken
 
 ### api
 #### getMealMenus

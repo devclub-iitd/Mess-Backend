@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ManagerModule } from './manager/manager.module';
 import CONFIG from './config';
 
 @Module({
@@ -11,6 +12,7 @@ import CONFIG from './config';
     MongooseModule.forRoot(CONFIG.MONGODB_STRING),
     AuthModule,
     PassportModule,
+    ManagerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
