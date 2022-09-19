@@ -53,8 +53,9 @@ TODO: implement inventory, keep track of how much raw material left
 
 ### staff
 #### verifyToken
+#### verityWithoutToken
 #### getProfile
-#### uploadPhoto
+#### uploadPhoto (TODO)
 #### getMealTokens
 #### useMealToken
 
