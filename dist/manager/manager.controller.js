@@ -74,6 +74,14 @@ let ManagerController = class ManagerController {
         }
         return x;
     }
+    async bulkCreateMealToken(body) {
+        const { meal_id, status } = body;
+        const x = await this.managerService.bulkCreateMealToken(meal_id, status);
+        if (!x) {
+            throw new common_1.NotFoundException();
+        }
+        return x;
+    }
     async getMealTokens(query) {
         const { kerberos, meal_id } = query;
         return this.managerService.getMealTokens(kerberos, meal_id);
@@ -127,6 +135,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ManagerController.prototype, "createMealToken", null);
+__decorate([
+    (0, common_1.Post)('bulkCreateMealToken'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ManagerController.prototype, "bulkCreateMealToken", null);
 __decorate([
     (0, common_1.Get)('getMealTokens'),
     __param(0, (0, common_1.Query)()),

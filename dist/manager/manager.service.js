@@ -41,6 +41,7 @@ let ManagerService = class ManagerService {
             kerberos: kerberos,
             name: name,
             hostel: hostel,
+            isActive: true,
         });
         return doc.save();
     }
@@ -51,10 +52,11 @@ let ManagerService = class ManagerService {
             name: d.name,
             hostel: d.hostel,
             kerberos: d.kerberos,
+            isActive: d.isActive
         }));
     }
     async createAccessToken(kerberos, scope) {
-        const u = await this.userModel.findOne({ kerberos: kerberos });
+        const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
         if (!u) {
             return null;
         }
@@ -71,7 +73,7 @@ let ManagerService = class ManagerService {
         return doc.save();
     }
     async getAccessTokens(kerberos) {
-        const u = await this.userModel.findOne({ kerberos: kerberos });
+        const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
         if (!u) {
             return null;
         }
@@ -110,9 +112,9 @@ let ManagerService = class ManagerService {
         }
     }
     async createMealToken(kerberos, meal_id, status) {
-        status = status || 'booked';
-        const u = await this.userModel.findOne({ kerberos: kerberos });
-        const m = await this.mealModel.findById(meal_id);
+        status = status || 'BOOKED';
+        const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
+        const m = await this.mealModel.findById(meal_id).select('_id');
         if (!u || !m) {
             return null;
         }
@@ -122,6 +124,16 @@ let ManagerService = class ManagerService {
             status: status,
         });
         return doc.save();
+    }
+    async bulkCreateMealToken(meal_id, status) {
+        status = status || 'BOOKED';
+        const m = await this.mealModel.findById(meal_id).select('_id');
+        if (!m) {
+            return null;
+        }
+        const users = await this.userModel.find({ isActive: true }).select('_id');
+        const doc = users.map(u => new this.mealTokenModel({ user_id: u, meal_id: m, status: status }));
+        return this.mealTokenModel.insertMany(doc);
     }
     async getMealTokens(kerberos, meal_id) {
         if (kerberos && meal_id) {

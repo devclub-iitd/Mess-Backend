@@ -40,6 +40,7 @@ export class ManagerService {
       kerberos: kerberos,
       name: name,
       hostel: hostel,
+      isActive: true,
     });
     return doc.save();
   }
@@ -51,11 +52,12 @@ export class ManagerService {
       name: d.name,
       hostel: d.hostel,
       kerberos: d.kerberos,
+      isActive: d.isActive
     }));
   }
 
   async createAccessToken(kerberos: string, scope: string) {
-    const u = await this.userModel.findOne({ kerberos: kerberos });
+    const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
     if (!u) {
       return null;
     }
@@ -73,7 +75,7 @@ export class ManagerService {
   }
 
   async getAccessTokens(kerberos: string) {
-    const u = await this.userModel.findOne({ kerberos: kerberos });
+    const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
     if (!u) {
       return null;
     }
@@ -121,9 +123,9 @@ export class ManagerService {
   }
 
   async createMealToken(kerberos: string, meal_id: string, status: string) {
-    status = status || 'booked';
-    const u = await this.userModel.findOne({ kerberos: kerberos });
-    const m = await this.mealModel.findById(meal_id);
+    status = status || 'BOOKED';
+    const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
+    const m = await this.mealModel.findById(meal_id).select('_id');
     if (!u || !m) {
       return null;
     }
@@ -133,6 +135,17 @@ export class ManagerService {
       status: status,
     });
     return doc.save();
+  }
+
+  async bulkCreateMealToken(meal_id: string, status: string) {
+    status = status || 'BOOKED';
+    const m = await this.mealModel.findById(meal_id).select('_id');
+    if (!m) {
+      return null;
+    }
+    const users = await this.userModel.find({isActive: true}).select('_id');
+    const doc = users.map(u => new this.mealTokenModel({user_id: u, meal_id: m, status: status}));
+    return this.mealTokenModel.insertMany(doc);
   }
 
   async getMealTokens(kerberos: string, meal_id: string) {

@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
   Query,
   UseGuards,
@@ -96,6 +97,16 @@ export class ManagerController {
       throw new BadRequestException();
     }
     return x;
+  }
+
+  @Post('bulkCreateMealToken')
+  async bulkCreateMealToken(@Body() body) {
+    const {meal_id, status} = body;
+    const x = await this.managerService.bulkCreateMealToken(meal_id, status);
+    if (!x) {
+      throw new NotFoundException();
+    }
+    return x; 
   }
 
   @Get('getMealTokens')

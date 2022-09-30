@@ -35,6 +35,7 @@ export declare class ManagerController {
         name: string;
         hostel: string;
         kerberos: string;
+        isActive: boolean;
     }[]>;
     createAccessToken(body: any): Promise<import("mongoose").Document<unknown, any, import("../schemas/accesstoken.schema").AccessTokenDocument> & import("../schemas/accesstoken.schema").AccessToken & Document & {
         _id: import("mongoose").Types.ObjectId;
@@ -51,6 +52,13 @@ export declare class ManagerController {
     createMealToken(body: any): Promise<import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     }>;
+    bulkCreateMealToken(body: any): Promise<(Omit<import("mongoose").MergeType<import("../schemas/mealtoken.schema").MealTokenDocument, import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
+        _id: import("mongoose").Types.ObjectId;
+    }>, keyof Document | "_id" | keyof import("../schemas/mealtoken.schema").MealToken> & import("../schemas/mealtoken.schema").MealToken & Document & {
+        _id: import("mongoose").Types.ObjectId;
+    } & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }>)[]>;
     getMealTokens(query: any): Promise<(import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;

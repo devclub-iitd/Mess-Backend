@@ -29,6 +29,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "hostel", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
 User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);
