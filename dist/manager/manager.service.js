@@ -52,7 +52,7 @@ let ManagerService = class ManagerService {
             name: d.name,
             hostel: d.hostel,
             kerberos: d.kerberos,
-            isActive: d.isActive
+            isActive: d.isActive,
         }));
     }
     async createAccessToken(kerberos, scope) {
@@ -77,7 +77,7 @@ let ManagerService = class ManagerService {
         if (!u) {
             return null;
         }
-        return this.accessTokenModel.find({ user_id: u });
+        return this.accessTokenModel.find({ user_id: u }).populate('user_id');
     }
     async createMeal(mess, name, start_time, end_time, capacity, price, fooditem_ids) {
         if (end_time < start_time) {
@@ -103,12 +103,10 @@ let ManagerService = class ManagerService {
             });
         }
         else if (limit > 0) {
-            return this.mealModel.find({ end_time: { $gt: date } }).limit(limit);
+            return this.mealModel.find({ start_time: { $gt: date } }).limit(limit);
         }
         else {
-            return this.mealModel
-                .find({ start_time: { $lt: date } })
-                .limit(0 - limit);
+            return this.mealModel.find({ end_time: { $lt: date } }).limit(0 - limit);
         }
     }
     async createMealToken(kerberos, meal_id, status) {
@@ -132,18 +130,20 @@ let ManagerService = class ManagerService {
             return null;
         }
         const users = await this.userModel.find({ isActive: true }).select('_id');
-        const doc = users.map(u => new this.mealTokenModel({ user_id: u, meal_id: m, status: status }));
+        const doc = users.map((u) => new this.mealTokenModel({ user_id: u, meal_id: m, status: status }));
         return this.mealTokenModel.insertMany(doc);
     }
     async getMealTokens(kerberos, meal_id) {
         if (kerberos && meal_id) {
-            return this.mealTokenModel.find({ kerberos: kerberos, meal_id: meal_id });
+            const u = await this.userModel.findOne({ kerberos: kerberos });
+            return this.mealTokenModel.find({ user_id: u, meal_id: meal_id }).populate(['meal_id', 'user_id']);
         }
         else if (kerberos) {
-            return this.mealTokenModel.find({ kerberos: kerberos });
+            const u = await this.userModel.findOne({ kerberos: kerberos });
+            return this.mealTokenModel.find({ user_id: u }).populate(['meal_id', 'user_id']);
         }
         else if (meal_id) {
-            return this.mealTokenModel.find({ meal_id: meal_id });
+            return this.mealTokenModel.find({ meal_id: meal_id }).populate(['meal_id', 'user_id']);
         }
     }
 };

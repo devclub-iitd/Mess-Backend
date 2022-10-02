@@ -64,7 +64,7 @@ let ManagerController = class ManagerController {
     }
     async getMeals(query) {
         const { limit, date } = query;
-        return this.managerService.getMeals(limit, date);
+        return this.managerService.getMeals(Number(limit), date);
     }
     async createMealToken(body) {
         const { kerberos, meal_id, status } = body;

@@ -50,9 +50,9 @@ export declare class ManagerService {
     createAccessToken(kerberos: string, scope: string): Promise<import("mongoose").Document<unknown, any, AccessTokenDocument> & AccessToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     }>;
-    getAccessTokens(kerberos: string): Promise<(import("mongoose").Document<unknown, any, AccessTokenDocument> & AccessToken & Document & {
+    getAccessTokens(kerberos: string): Promise<Omit<import("mongoose").Document<unknown, any, AccessTokenDocument> & AccessToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    })[]>;
+    }, never>[]>;
     createMeal(mess: string, name: string, start_time: Date, end_time: Date, capacity: number, price: number, fooditem_ids: string[]): Promise<import("mongoose").Document<unknown, any, MealDocument> & Meal & Document & {
         _id: import("mongoose").Types.ObjectId;
     }>;
@@ -69,7 +69,7 @@ export declare class ManagerService {
     } & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>)[]>;
-    getMealTokens(kerberos: string, meal_id: string): Promise<(import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
+    getMealTokens(kerberos: string, meal_id: string): Promise<Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    })[]>;
+    }, never>[]>;
 }

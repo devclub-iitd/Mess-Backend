@@ -1,0 +1,172 @@
+{{> base_start}}
+{{> protected}}
+
+<h1>User Management</h1>
+<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createUserModal">Create User</button>
+<button class="btn btn-primary" id="getUsers">Get Users</button>
+<div class = "container my-4" id="users"></div>
+<div class="modal" tabindex="-1" id="createUserModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Kerberos</span>
+                <input type="text" id="create_kerberos" class="form-control" placeholder="Kerberos" aria-label="Kerberos">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Name</span>
+                <input type="text" id="create_name" class="form-control" placeholder="Name" aria-label="Name">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Hostel</span>
+                <select class="form-control" id="create_hostel" aria-label="Hostel">
+                    <option selected value="UDAIGIRI">UDAIGIRI</option>
+                    <option value="GIRNAR">GIRNAR</option>
+                    <option value="Others">Others</option>
+                    <option value="None">None</option>
+                </select>
+            </div>
+            <div id="createError"></div>
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createUser">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" tabindex="-1" id="qrModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">QR Codes for <code id="selectedUser"></code></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container" id="qrList"></div>
+      </div>
+      <div id="qrError"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createQR">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function templateUserCard(id, name, hostel, kerberos, isActive) {
+        return `<div class='row ${isActive? 'bg-light' : 'bg-danger'} m-2' id='user_${id}'>
+            <div class='col'>${kerberos}</div>
+            <div class='col'>${hostel}</div>
+            <div class='col'>${name}</div>
+            <div class='col'>
+                <button 
+                    class='btn btn-primary' 
+                    onclick="showQR('${kerberos}');"  
+                    data-bs-toggle="modal" 
+                    data-bs-target="#qrModal"
+                >
+                    QR
+                </button>
+            </div>
+        </div>`;
+    }
+
+    function getUsers() {
+        document.querySelector('div#users').innerHTML = "<div class='spinner-border' role='status'>";
+        fetch("/manager/getUsers", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('div#users').innerHTML = data.map(
+                u => templateUserCard(u['id'], u['name'], u['hostel'], u['kerberos'], u['isActive'])
+                ).join(''));
+    }
+    document.querySelector('button#getUsers').addEventListener('click', getUsers);
+
+    function createUser() {
+        const k = document.querySelector('input#create_kerberos').value;
+        const n = document.querySelector('input#create_name').value;
+        const h = document.querySelector('select#create_hostel').value;
+        fetch("/manager/createUser", {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({kerberos: k, name: n, hostel: h}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(async response => {
+            if (response.status === 201) {
+                document.querySelector('div#createError').innerText = "User Successfully Created!";
+            } else {
+                document.querySelector('div#createError').innerText = await response.text(); 
+            }
+        });
+    }
+    document.querySelector('button#createUser').addEventListener('click', createUser);
+
+    function templateQRCard(id, user_id, token, created_time, isActive, scope) {
+        const qrString = JSON.stringify({kerberos: user_id.kerberos, token: token});
+        const time = (new Date(created_time)).toLocaleString();
+        return `<div class="card">
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrString)}" 
+                class="card-img-top" 
+                alt="${token}"
+            >
+            <div class="card-body">
+                <span class="badge bg-secondary">Scope
+                    <span class="badge rounded-pill text-bg-dark">${scope}</span>
+                </span>
+                <span class="badge bg-primary">Created
+                    <span class="badge rounded-pill text-bg-dark">${time}</span>
+                </span>
+                <span class="badge ${isActive ? 'bg-success' : 'bg-danger'}">
+                   ${isActive ? 'Active' : 'Disabled'} 
+                </span>
+            </div>
+        </div>`;
+    }
+    function showQR(kerberos) {
+        document.querySelector('code#selectedUser').innerText = kerberos;
+        document.querySelector('div#qrError').innerText = "";
+        document.querySelector('div#qrList').innerHTML = "<div class='spinner-border' role='status'>";
+
+        fetch(`/manager/getAccessTokens?kerberos=${kerberos}`, {
+                credentials:"include"
+            }).then(response => response.json()
+            ).then(data => document.querySelector('div#qrList').innerHTML = data.map(
+                q => templateQRCard(
+                    q['id'],
+                    q['user_id'], 
+                    q['token'], 
+                    q['created_time'], 
+                    q['isActive'], 
+                    q['scope']
+            )).join(''));
+    }
+    function createQR() {
+        const k = document.querySelector('code#selectedUser').innerText;
+        fetch('/manager/createAccessToken', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({kerberos: k}),
+            headers: { 'Content-Type': 'application/json' } 
+        }).then(async response => {
+            if (response.status === 201) {
+                document.querySelector('div#qrError').innerText = "QR Successfully Created!";
+                showQR(k);
+            } else {
+                document.querySelector('div#qrError').innerText = await response.text(); 
+            }
+        });
+    }
+    document.querySelector('button#createQR').addEventListener('click', createQR);
+</script>
+{{> base_end}}

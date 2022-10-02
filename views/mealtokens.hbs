@@ -1,0 +1,188 @@
+{{>base_start}}
+{{>protected}}
+
+<h1>Meal Tokens</h1>
+<button class="btn btn-success my-4" data-bs-toggle="modal" data-bs-target="#createMealTokenModal">Create MealToken</button>
+<div class="modal" tabindex="-1" id="createMealTokenModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Meal Token</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Kerberos</span>
+                <select class="form-control" id="create_kerberos" aria-label="Meal">
+                    <option value=""></option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Meal</span>
+                <select class="form-control" id="create_meal" aria-label="Mess">
+                    <option value=""></option>
+                </select>
+            </div>
+            <div id="createError"></div>
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createMealToken">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form">
+    <div class="input-group mb-3">
+        <span class="input-group-text">Kerberos</span>
+        <select class="form-control" id="get_kerberos" aria-label="Meal">
+            <option value=""></option>
+        </select>
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Meal</span>
+        <select class="form-control" id="get_meal" aria-label="Meal">
+            <option value=""></option>
+        </select>
+    </div>
+    <button id="get_bymealid">Find by Meal</button>
+    <button id="get_byuser">Find by User</button>
+    <div id="createError"></div>
+    </div>
+</div>
+<br>
+<div class="container">
+    <h5>Total Tokens: <span id='token_count'></span></h5>
+    <h5>Tokens Used: <span id='token_used'></span></h5>
+</div>
+<div class="container" id="mealtokens"></div>
+
+<script>
+    function mealOption(meal) {
+        const start = (new Date(meal.start_time)).toLocaleString();
+        const end = (new Date(meal.end_time)).toLocaleString();
+
+        return `<option value='${meal._id}'>${meal.name} (${start} - ${end})</option>`;
+    }
+    function userOption(user) {
+        return `<option value='${user.kerberos}'>${user.kerberos} (${user.name}) | ${user.hostel}</option>`;
+    }
+    function userActiveOption(user) {
+        return `
+        <option value='${user.kerberos}' ${user.isActive ? '' : 'disabled'}>
+            ${user.kerberos} (${user.name}) | ${user.hostel}
+        </option>`; 
+    }
+    function tokenCard(token) {
+        return `
+        <div class='row bg-light m-2' id='token_${token._id}'>
+            <div class='col'>${token.user_id.kerberos} | ${token.user_id.name}</div>
+            <div class='col'>${token.meal_id.name} | ${(new Date(token.meal_id.start_time)).toDateString()}</div>
+            <div class='col'>
+                <span class="badge ${token.status === 'USED' ? 'bg-secondary' : 'bg-warning'}">
+                    ${token.status}
+                </span>
+            </div>
+            <div class='col'>
+                ${token.enter_time ?
+                    "Entered: "+ (new Date(token.enter_time)).toLocaleString()
+                    : ""}
+            </div>
+        </div>
+        `;
+    }
+
+    function updateCreateMealOptions() {
+        document.querySelector('select#create_meal').innerHTML = '';
+        fetch("/manager/getMeals?limit=0", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#create_meal').innerHTML += data.map(
+                m => mealOption(m)).join(''));
+        fetch("/manager/getMeals?limit=10", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#create_meal').innerHTML += data.map(
+                m => mealOption(m)).join(''));
+        fetch("/manager/getUsers", {credentials:"include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#create_kerberos').innerHTML = data.map(
+                u => userActiveOption(u)).join(''));
+    }
+    updateCreateMealOptions();
+
+    function createMealToken() {
+        const k = document.querySelector('select#create_kerberos').value;
+        const m = document.querySelector('select#create_meal').value;
+        fetch("/manager/createMealToken", {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({kerberos: k, meal_id: m}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(async response => {
+            if (response.status === 201) {
+                document.querySelector('div#createError').innerText = "Meal Token Successfully Created!";
+            } else {
+                document.querySelector('div#createError').innerText = await response.text(); 
+            }
+        });
+    }
+    document.querySelector('button#createMealToken').addEventListener('click', createMealToken);
+
+    function updateGetMealOptions() {
+        document.querySelector('select#get_meal').innerHTML = '';
+        document.querySelector('select#get_kerberos').innerHTML = '';
+        fetch("/manager/getMeals?limit=0", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join(''));
+        fetch("/manager/getMeals?limit=15", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join(''));
+        fetch("/manager/getMeals?limit=-15", { credentials : "include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join(''));
+        fetch("/manager/getUsers", {credentials:"include"}
+            ).then(response => response.json()
+            ).then(data => document.querySelector('select#get_kerberos').innerHTML = data.map(
+                u => userOption(u)).join(''));
+    }
+    updateGetMealOptions();
+
+    function getMealTokensByMeal() {
+        const m = document.querySelector('select#get_meal').value;
+        document.querySelector('span#token_count').innerText = 0;
+        document.querySelector('span#token_used').innerText = 0;
+        document.querySelector('div#mealtokens').innerHTML = "<div class='spinner-border' role='status'>";
+        fetch("/manager/getMealTokens?meal_id="+m, {credentials:"include"}
+            ).then(response => response.json()
+            ).then(data => {
+                document.querySelector('span#token_count').innerText = data.length;
+                document.querySelector('span#token_used').innerText = data.filter(d => d.status === 'USED').length;
+                document.querySelector('div#mealtokens').innerHTML = data.map(t => tokenCard(t)).join('');
+            });
+    }
+    document.querySelector('button#get_bymealid').addEventListener('click', getMealTokensByMeal);
+    
+    function getMealTokensByUser() {
+        const k = document.querySelector('select#get_kerberos').value;
+        document.querySelector('span#token_count').innerText = 0;
+        document.querySelector('span#token_used').innerText = 0;
+        document.querySelector('div#mealtokens').innerHTML = "<div class='spinner-border' role='status'>";
+        fetch("/manager/getMealTokens?kerberos="+k, {credentials:"include"}
+            ).then(response => response.json()
+            ).then(data => {
+                document.querySelector('span#token_count').innerText = data.length;
+                document.querySelector('span#token_used').innerText = data.filter(d => d.status === 'USED').length;
+                document.querySelector('div#mealtokens').innerHTML = data.map(t => tokenCard(t)).join('')
+            });
+    }
+    document.querySelector('button#get_byuser').addEventListener('click', getMealTokensByUser);
+    
+</script>
+{{>base_end}}
