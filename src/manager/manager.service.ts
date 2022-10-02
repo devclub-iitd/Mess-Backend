@@ -73,7 +73,7 @@ export class ManagerService {
 		if (!u) {
 			return null;
 		}
-		return this.accessTokenModel.find({ user_id: u });
+		return this.accessTokenModel.find({ user_id: u }).populate('user_id');
 	}
 
 	async createMeal(
@@ -108,9 +108,9 @@ export class ManagerService {
 				start_time: { $lt: date },
 			});
 		} else if (limit > 0) {
-			return this.mealModel.find({ end_time: { $gt: date } }).limit(limit);
+			return this.mealModel.find({ start_time: { $gt: date } }).limit(limit);
 		} else {
-			return this.mealModel.find({ start_time: { $lt: date } }).limit(0 - limit);
+			return this.mealModel.find({ end_time: { $lt: date } }).limit(0 - limit);
 		}
 	}
 
@@ -142,11 +142,13 @@ export class ManagerService {
 
 	async getMealTokens(kerberos: string, meal_id: string) {
 		if (kerberos && meal_id) {
-			return this.mealTokenModel.find({ kerberos: kerberos, meal_id: meal_id });
+			const u = await this.userModel.findOne({ kerberos: kerberos });
+			return this.mealTokenModel.find({ user_id: u, meal_id: meal_id }).populate(['meal_id', 'user_id']);
 		} else if (kerberos) {
-			return this.mealTokenModel.find({ kerberos: kerberos });
+			const u = await this.userModel.findOne({ kerberos: kerberos });
+			return this.mealTokenModel.find({ user_id: u }).populate(['meal_id', 'user_id']);
 		} else if (meal_id) {
-			return this.mealTokenModel.find({ meal_id: meal_id });
+			return this.mealTokenModel.find({ meal_id: meal_id }).populate(['meal_id', 'user_id']);
 		}
 	}
 }

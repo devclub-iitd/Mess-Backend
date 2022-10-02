@@ -63,7 +63,7 @@ export class ManagerController {
 	@Get('getMeals')
 	async getMeals(@Query() query) {
 		const { limit, date } = query;
-		return this.managerService.getMeals(limit, date);
+		return this.managerService.getMeals(Number(limit), date);
 	}
 
 	@Post('createMealToken')
