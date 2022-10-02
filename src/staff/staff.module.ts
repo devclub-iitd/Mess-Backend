@@ -8,15 +8,15 @@ import { StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: AccessToken.name, schema: AccessTokenSchema },
-      { name: MealToken.name, schema: MealTokenSchema },
-      { name: Meal.name, schema: MealSchema },
-    ]),
-  ],
-  controllers: [StaffController],
-  providers: [StaffService],
+	imports: [
+		MongooseModule.forFeature([
+			{ name: User.name, schema: UserSchema },
+			{ name: AccessToken.name, schema: AccessTokenSchema },
+			{ name: MealToken.name, schema: MealTokenSchema },
+			{ name: Meal.name, schema: MealSchema },
+		]),
+	],
+	controllers: [StaffController],
+	providers: [StaffService],
 })
 export class StaffModule {}

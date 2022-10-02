@@ -6,10 +6,8 @@ import { Admin, AdminSchema } from 'src/schemas/admin.schema';
 import { LocalStrategy } from './passport/local.strategy';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
-  ],
-  providers: [AuthService, LocalStrategy],
-  controllers: [AuthController],
+	imports: [MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }])],
+	providers: [AuthService, LocalStrategy],
+	controllers: [AuthController],
 })
 export class AuthModule {}

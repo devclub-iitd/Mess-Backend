@@ -10,17 +10,17 @@ import { ManagerController } from './manager.controller';
 import { ManagerService } from './manager.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: AccessToken.name, schema: AccessTokenSchema },
-      { name: FoodItem.name, schema: FoodItemSchema },
-      { name: Meal.name, schema: MealSchema },
-      { name: MealToken.name, schema: MealTokenSchema },
-      { name: RawMaterial.name, schema: RawMaterialSchema },
-      { name: User.name, schema: UserSchema },
-    ]),
-  ],
-  controllers: [ManagerController],
-  providers: [ManagerService],
+	imports: [
+		MongooseModule.forFeature([
+			{ name: AccessToken.name, schema: AccessTokenSchema },
+			{ name: FoodItem.name, schema: FoodItemSchema },
+			{ name: Meal.name, schema: MealSchema },
+			{ name: MealToken.name, schema: MealTokenSchema },
+			{ name: RawMaterial.name, schema: RawMaterialSchema },
+			{ name: User.name, schema: UserSchema },
+		]),
+	],
+	controllers: [ManagerController],
+	providers: [ManagerService],
 })
 export class ManagerModule {}

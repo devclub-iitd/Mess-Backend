@@ -9,14 +9,8 @@ import { StaffModule } from './staff/staff.module';
 import CONFIG from './config';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(CONFIG.MONGODB_STRING),
-    AuthModule,
-    PassportModule,
-    ManagerModule,
-    StaffModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+	imports: [MongooseModule.forRoot(CONFIG.MONGODB_STRING), AuthModule, PassportModule, ManagerModule, StaffModule],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}

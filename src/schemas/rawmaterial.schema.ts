@@ -2,11 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
 export class RawMaterial {
-  @Prop({ required: true })
-  name: string;
+	@Prop({ required: true })
+	name: string;
 
-  @Prop()
-  vendors: string[];
+	@Prop()
+	vendors: string[];
 }
 
 export type RawMaterialDocument = RawMaterial & Document;

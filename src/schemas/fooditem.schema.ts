@@ -4,14 +4,14 @@ import { RawMaterial } from './rawmaterial.schema';
 
 @Schema()
 export class FoodItem {
-  @Prop({ required: true })
-  name: string;
+	@Prop({ required: true })
+	name: string;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'RawMaterial',
-  })
-  rawmaterial_ids: RawMaterial[];
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'RawMaterial',
+	})
+	rawmaterial_ids: RawMaterial[];
 }
 
 export type FoodItemDocument = FoodItem & Document;
