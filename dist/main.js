@@ -8,7 +8,9 @@ const path_1 = require("path");
 const hbs = require("hbs");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const MongoStore = require('connect-mongo');
     app.use(session({
+        store: MongoStore.create({ mongoUrl: config_1.default.MONGODB_STRING }),
         secret: config_1.default.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,

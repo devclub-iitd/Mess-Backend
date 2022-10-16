@@ -64,7 +64,7 @@ export declare class ManagerService {
     }>;
     bulkCreateMealToken(meal_id: string, status: string): Promise<(Omit<import("mongoose").MergeType<MealTokenDocument, import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    }>, keyof Document | "_id" | keyof MealToken> & MealToken & Document & {
+    }>, "_id" | keyof Document | keyof MealToken> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     } & Required<{
         _id: import("mongoose").Types.ObjectId;
