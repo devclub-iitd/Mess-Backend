@@ -18,8 +18,13 @@ export class StaffService {
 	) {}
 
 	async verifyToken(kerberos: string, token: string) {
+		let a = new Date();
 		const u = await this.userModel.findOne({ kerberos: kerberos });
+		let b = new Date();
+		console.log('userModel.findOne({ kerberos: kerberos })', b.valueOf() - a.valueOf());
 		const t = await this.accessTokenModel.findOne({ token: token });
+		let c = new Date();
+		console.log('accessTokenModel.findOne({ token: token })', c.valueOf() - b.valueOf());
 		if (!u || !t) {
 			return 0;
 		}
@@ -29,12 +34,21 @@ export class StaffService {
 				end_time: { $gt: new Date() },
 				start_time: { $lt: new Date() },
 			});
+
+			let d = new Date();
+			console.log(
+				'mealModel.find({end_time: { $gt: new Date() },start_time: { $lt: new Date() },})',
+				d.valueOf() - c.valueOf(),
+			);
 			const doc = await this.mealTokenModel
 				.find({
 					user_id: u,
 					meal_id: active,
 				})
 				.populate('meal_id');
+			let e = new Date();
+			console.log("mealTokenModel.find({user_id: u, meal_id: active,}).populate('meal_id')", e.valueOf() - d.valueOf());
+			console.log('Total:', e.valueOf() - a.valueOf());
 			return { token: t, active_meals: doc };
 		}
 		return -1;
