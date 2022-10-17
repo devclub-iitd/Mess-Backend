@@ -9,8 +9,11 @@ import * as hbs from 'hbs';
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+	const MongoStore = require('connect-mongo');
+
 	app.use(
 		session({
+			store: MongoStore.create({ mongoUrl: CONFIG.MONGODB_STRING }),
 			secret: CONFIG.SESSION_SECRET,
 			resave: false,
 			saveUninitialized: false,

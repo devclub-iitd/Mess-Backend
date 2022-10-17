@@ -31,9 +31,9 @@ export declare class StaffController {
         token: import("mongoose").Document<unknown, any, import("../schemas/accesstoken.schema").AccessTokenDocument> & import("../schemas/accesstoken.schema").AccessToken & Document & {
             _id: import("mongoose").Types.ObjectId;
         };
-        active_meals: (import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
+        active_meals: Omit<import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
             _id: import("mongoose").Types.ObjectId;
-        })[];
+        }, never>[];
     }>;
     verifyWithoutToken(query: any): Promise<{
         user: import("mongoose").Document<unknown, any, import("../schemas/user.schema").UserDocument> & import("../schemas/user.schema").User & Document & {

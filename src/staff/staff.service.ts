@@ -29,10 +29,12 @@ export class StaffService {
 				end_time: { $gt: new Date() },
 				start_time: { $lt: new Date() },
 			});
-			const doc = await this.mealTokenModel.find({
-				user_id: u,
-				meal_id: active,
-			});
+			const doc = await this.mealTokenModel
+				.find({
+					user_id: u,
+					meal_id: active,
+				})
+				.populate('meal_id');
 			return { token: t, active_meals: doc };
 		}
 		return -1;

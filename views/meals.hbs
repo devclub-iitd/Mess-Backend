@@ -97,8 +97,8 @@
 
     function createMeal() {
         const n = document.querySelector('input#create_name').value;
-        const s = document.querySelector('input#create_start').value;
-        const e = document.querySelector('input#create_end').value;
+        const s = new Date(document.querySelector('input#create_start').value).toISOString();
+        const e = new Date(document.querySelector('input#create_end').value).toISOString();
         const c = document.querySelector('input#create_capacity').value;
         const p = document.querySelector('input#create_price').value;
         const m = document.querySelector('select#create_mess').value;

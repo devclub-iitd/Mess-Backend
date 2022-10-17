@@ -37,9 +37,9 @@ export declare class StaffService {
         token: import("mongoose").Document<unknown, any, AccessTokenDocument> & AccessToken & Document & {
             _id: import("mongoose").Types.ObjectId;
         };
-        active_meals: (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
+        active_meals: Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
             _id: import("mongoose").Types.ObjectId;
-        })[];
+        }, never>[];
     }>;
     verifyWithoutToken(kerberos: string): Promise<{
         user: import("mongoose").Document<unknown, any, UserDocument> & User & Document & {
