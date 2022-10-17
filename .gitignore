@@ -1,4 +1,8 @@
 .env
+scripts/data
+scripts/outputs
+scripts/logs
+
 # https://devcenter.heroku.com/articles/migrating-to-yarn-2#local-setup
 .pnp.*
 .yarn/*
