@@ -11,10 +11,13 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 let AdminAuthGuard = class AdminAuthGuard extends (0, passport_1.AuthGuard)() {
     canActivate(context) {
+        const a = new Date();
         const request = context.switchToHttp().getRequest();
         if (!request.session.user) {
             throw new common_1.UnauthorizedException('Please login');
         }
+        const b = new Date();
+        console.log('AdminAuthGuard', b.valueOf() - a.valueOf());
         return true;
     }
 };

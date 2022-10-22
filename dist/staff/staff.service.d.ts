@@ -55,7 +55,7 @@ export declare class StaffService {
     getMealTokens(kerberos: string): Promise<Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     }, never>[]>;
-    useMealToken(id: string): Promise<0 | -1 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
+    useMealToken(id: string): Promise<0 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    })>;
+    }) | -1>;
 }

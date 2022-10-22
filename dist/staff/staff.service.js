@@ -28,8 +28,13 @@ let StaffService = class StaffService {
         this.mealModel = mealModel;
     }
     async verifyToken(kerberos, token) {
+        let a = new Date();
         const u = await this.userModel.findOne({ kerberos: kerberos });
+        let b = new Date();
+        console.log('userModel.findOne({ kerberos: kerberos })', b.valueOf() - a.valueOf());
         const t = await this.accessTokenModel.findOne({ token: token });
+        let c = new Date();
+        console.log('accessTokenModel.findOne({ token: token })', c.valueOf() - b.valueOf());
         if (!u || !t) {
             return 0;
         }
@@ -39,12 +44,16 @@ let StaffService = class StaffService {
                 end_time: { $gt: new Date() },
                 start_time: { $lt: new Date() },
             });
+            let d = new Date();
+            console.log('mealModel.find({end_time: { $gt: new Date() },start_time: { $lt: new Date() },})', d.valueOf() - c.valueOf());
             const doc = await this.mealTokenModel
                 .find({
                 user_id: u,
                 meal_id: active,
             })
                 .populate('meal_id');
+            let e = new Date();
+            console.log("mealTokenModel.find({user_id: u, meal_id: active,}).populate('meal_id')", e.valueOf() - d.valueOf());
             return { token: t, active_meals: doc };
         }
         return -1;
@@ -70,7 +79,10 @@ let StaffService = class StaffService {
         return this.mealTokenModel.find({ user_id: u }).populate('meal_id');
     }
     async useMealToken(id) {
+        const a = new Date();
         const doc = await this.mealTokenModel.findById(id);
+        const b = new Date();
+        console.log('mealTokenModel.findById(id)', b.valueOf() - a.valueOf());
         if (!doc) {
             return 0;
         }
