@@ -19,6 +19,7 @@ export class StaffController {
 
 	@Get('verifyToken')
 	async verifyToken(@Query() query) {
+		const a = new Date();
 		const { kerberos, token } = query;
 		const x = await this.staffService.verifyToken(kerberos, token);
 		if (x === 0) {
@@ -26,6 +27,8 @@ export class StaffController {
 		} else if (x === -1) {
 			throw new BadRequestException();
 		}
+		const b = new Date();
+		console.log('verifyToken', b.valueOf() - a.valueOf());
 		return x;
 	}
 
@@ -47,8 +50,11 @@ export class StaffController {
 
 	@Post('useMealToken')
 	async useMealToken(@Body() body) {
+		const a = new Date();
 		const { token_id } = body;
 		const x = await this.staffService.useMealToken(token_id);
+		const b = new Date();
+		console.log('useMealToken', b.valueOf() - a.valueOf());
 		if (x === 0) {
 			throw new NotFoundException('No such meal token');
 		} else if (x === -1) {

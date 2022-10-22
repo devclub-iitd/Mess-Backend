@@ -48,7 +48,6 @@ export class StaffService {
 				.populate('meal_id');
 			let e = new Date();
 			console.log("mealTokenModel.find({user_id: u, meal_id: active,}).populate('meal_id')", e.valueOf() - d.valueOf());
-			console.log('Total:', e.valueOf() - a.valueOf());
 			return { token: t, active_meals: doc };
 		}
 		return -1;
@@ -77,7 +76,10 @@ export class StaffService {
 	}
 
 	async useMealToken(id: string) {
+		const a = new Date();
 		const doc = await this.mealTokenModel.findById(id);
+		const b = new Date();
+		console.log('mealTokenModel.findById(id)', b.valueOf() - a.valueOf());
 		if (!doc) {
 			return 0;
 		}
