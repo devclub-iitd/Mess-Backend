@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", user_schema_1.User)
 ], AccessToken.prototype, "user_id", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, unique: true }),
     __metadata("design:type", String)
 ], AccessToken.prototype, "token", void 0);
 __decorate([

@@ -54,7 +54,7 @@ export declare class ManagerController {
     }>;
     bulkCreateMealToken(body: any): Promise<(Omit<import("mongoose").MergeType<import("../schemas/mealtoken.schema").MealTokenDocument, import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    }>, keyof Document | keyof import("../schemas/mealtoken.schema").MealToken | "_id"> & import("../schemas/mealtoken.schema").MealToken & Document & {
+    }>, keyof Document | "_id" | keyof import("../schemas/mealtoken.schema").MealToken> & import("../schemas/mealtoken.schema").MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     } & Required<{
         _id: import("mongoose").Types.ObjectId;

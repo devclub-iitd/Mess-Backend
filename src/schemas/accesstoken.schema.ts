@@ -11,7 +11,7 @@ export class AccessToken {
 	})
 	user_id: User;
 
-	@Prop({ required: true })
+	@Prop({ required: true, unique: true })
 	token: string;
 
 	@Prop({ required: true })

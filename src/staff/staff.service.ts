@@ -18,39 +18,73 @@ export class StaffService {
 	) {}
 
 	async verifyToken(kerberos: string, token: string) {
-		let a = new Date();
-		const u = await this.userModel.findOne({ kerberos: kerberos });
-		let b = new Date();
-		console.log('userModel.findOne({ kerberos: kerberos })', b.valueOf() - a.valueOf());
-		const t = await this.accessTokenModel.findOne({ token: token });
-		let c = new Date();
-		console.log('accessTokenModel.findOne({ token: token })', c.valueOf() - b.valueOf());
-		if (!u || !t) {
-			return 0;
-		}
-		await t.populate('user_id');
-		if (u.kerberos === t.user_id.kerberos && t.isActive) {
-			const active = await this.mealModel.find({
-				end_time: { $gt: new Date() },
-				start_time: { $lt: new Date() },
-			});
+		const accessTokens = await this.accessTokenModel.aggregate([
+			{ $match: { token: token } },
+			{
+				$lookup: {
+					from: 'users',
+					as: 'users',
+					localField: 'user_id',
+					foreignField: '_id',
+					let: { token_user_id: '$user_id' },
+					pipeline: [
+						{
+							$lookup: {
+								from: 'meals',
+								as: 'meals',
+								pipeline: [
+									{
+										$match: {
+											$and: [{ start_time: { $lt: new Date() } }, { end_time: { $gt: new Date() } }],
+										},
+									},
+									{
+										$lookup: {
+											from: 'mealtokens',
+											as: 'mealtokens',
+											localField: '_id',
+											foreignField: 'meal_id',
+											pipeline: [{ $match: { $expr: { $eq: ['$$token_user_id', '$user_id'] } } }],
+										},
+									},
+								],
+							},
+						},
+					],
+				},
+			},
+		]);
+		// No such token as requested
+		if (accessTokens.length === 0) return 0;
+		// Token doesn't have any user?
+		if (accessTokens[0].users.length === 0) return 0;
 
-			let d = new Date();
-			console.log(
-				'mealModel.find({end_time: { $gt: new Date() },start_time: { $lt: new Date() },})',
-				d.valueOf() - c.valueOf(),
-			);
-			const doc = await this.mealTokenModel
-				.find({
-					user_id: u,
-					meal_id: active,
-				})
-				.populate('meal_id');
-			let e = new Date();
-			console.log("mealTokenModel.find({user_id: u, meal_id: active,}).populate('meal_id')", e.valueOf() - d.valueOf());
-			return { token: t, active_meals: doc };
-		}
-		return -1;
+		const user = accessTokens[0].users[0];
+		// Kerberos doesn't match with request
+		if (user.kerberos !== kerberos) return -1;
+
+		return {
+			token: {
+				user_id: {
+					name: user.name,
+					kerberos: user.kerberos,
+					hostel: user.hostel,
+					isActive: user.isActive,
+				},
+			},
+			active_meals: user.meals.flatMap((meal: any) =>
+				meal.mealtokens.map((mealtoken: any) => ({
+					_id: mealtoken._id,
+					status: mealtoken.status,
+					enter_time: mealtoken.enter_time,
+					meal_id: {
+						name: meal.name,
+						start_time: meal.start_time,
+						end_time: meal.end_time,
+					},
+				})),
+			),
+		};
 	}
 
 	async verifyWithoutToken(kerberos: string) {

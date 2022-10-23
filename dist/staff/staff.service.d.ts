@@ -33,13 +33,16 @@ export declare class StaffService {
     private mealTokenModel;
     private mealModel;
     constructor(userModel: Model<UserDocument>, accessTokenModel: Model<AccessTokenDocument>, mealTokenModel: Model<MealTokenDocument>, mealModel: Model<MealDocument>);
-    verifyToken(kerberos: string, token: string): Promise<0 | -1 | {
-        token: import("mongoose").Document<unknown, any, AccessTokenDocument> & AccessToken & Document & {
-            _id: import("mongoose").Types.ObjectId;
+    verifyToken(kerberos: string, token: string): Promise<-1 | 0 | {
+        token: {
+            user_id: {
+                name: any;
+                kerberos: any;
+                hostel: any;
+                isActive: any;
+            };
         };
-        active_meals: Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
-            _id: import("mongoose").Types.ObjectId;
-        }, never>[];
+        active_meals: any;
     }>;
     verifyWithoutToken(kerberos: string): Promise<{
         user: import("mongoose").Document<unknown, any, UserDocument> & User & Document & {
@@ -55,7 +58,7 @@ export declare class StaffService {
     getMealTokens(kerberos: string): Promise<Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     }, never>[]>;
-    useMealToken(id: string): Promise<0 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
+    useMealToken(id: string): Promise<-1 | 0 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    }) | -1>;
+    })>;
 }
