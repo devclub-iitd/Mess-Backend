@@ -5,60 +5,65 @@
 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createMealModal">Create Meal</button>
 <button class="btn btn-primary" id="getMeals">Get Meals</button>
 <h4>Current Meals</h4>
-<div class = "container my-4" id="current_meals"></div>
+<div class="container my-4" id="current_meals"></div>
 <h4>Future Meals</h4>
-<div class = "container my-4" id="future_meals"></div>
+<div class="container my-4" id="future_meals"></div>
 <h4>Past Meals</h4>
-<div class = "container my-4" id="past_meals"></div>
+<div class="container my-4" id="past_meals"></div>
 <div class="modal" tabindex="-1" id="createMealModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create Meal</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="form">
-            <div class="input-group mb-3">
-                <span class="input-group-text">Name</span>
-                <input type="text" id="create_name" class="form-control" placeholder="Meal" aria-label="StartTime">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Meal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Start Time</span>
-                <input type="datetime-local" id="create_start" class="form-control" aria-label="StartTime">
+            <div class="modal-body">
+                <div class="form">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Name</span>
+                        <input type="text" id="create_name" class="form-control" placeholder="Meal"
+                            aria-label="StartTime">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Start Time</span>
+                        <input type="datetime-local" step="300" id="create_start" class="form-control"
+                            aria-label="StartTime">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">End Time</span>
+                        <input type="datetime-local" step="300" id="create_end" class="form-control"
+                            aria-label="EndTime">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Capacity</span>
+                        <input type="number" value='1000' id="create_capacity" class="form-control"
+                            aria-label="Capacity">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Price</span>
+                        <input type="number" value='0' id="create_price" class="form-control" aria-label="Price">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Mess</span>
+                        <select class="form-control" id="create_mess" aria-label="Mess">
+                            <option selected value="UDAIGIRI">UDAIGIRI</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="checkbox" checked id="create_all" name="all" value="Auto" class="form-check-input"
+                            aria-label="auto">
+                        Auto-Assign to All Users?
+                    </div>
+                    <div id="createError"></div>
+                </div>
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">End Time</span>
-                <input type="datetime-local" id="create_end" class="form-control" aria-label="EndTime">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Capacity</span>
-                <input type="number" value='1000' id="create_capacity" class="form-control" aria-label="Capacity">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Price</span>
-                <input type="number" value='0' id="create_price" class="form-control" aria-label="Price">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Mess</span>
-                <select class="form-control" id="create_mess" aria-label="Mess">
-                    <option selected value="UDAIGIRI">UDAIGIRI</option>
-                    <option value="Others">Others</option>
-                </select>
-            </div>
-             <div class="input-group mb-3">
-                <input type="checkbox" checked id="create_all" name="all" value="Auto" class="form-check-input" aria-label="auto">
-                Auto-Assign to All Users?
-            </div> 
-            <div id="createError"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="createMeal">Create</button>
             </div>
         </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="createMeal">Create</button>
-      </div>
     </div>
-  </div>
 </div>
 <script>
     function templateMealCard(meal) {
@@ -79,18 +84,18 @@
         document.querySelector('div#future_meals').innerHTML = "<div class='spinner-border' role='status'>";
         document.querySelector('div#past_meals').innerHTML = "<div class='spinner-border' role='status'>";
         const d = (new Date()).toString();
-        fetch("/manager/getMeals?limit=0", { credentials : "include"}
-            ).then(response => response.json()
-            ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
-                m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=10", { credentials : "include"}
-            ).then(response => response.json()
-            ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
-                m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=-10", { credentials : "include"}
-            ).then(response => response.json()
-            ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
-                m => templateMealCard(m)).join(''));
+        fetch("/manager/getMeals?limit=0", { credentials: "include" }
+        ).then(response => response.json()
+        ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
+            m => templateMealCard(m)).join(''));
+        fetch("/manager/getMeals?limit=10", { credentials: "include" }
+        ).then(response => response.json()
+        ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
+            m => templateMealCard(m)).join(''));
+        fetch("/manager/getMeals?limit=-10", { credentials: "include" }
+        ).then(response => response.json()
+        ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
+            m => templateMealCard(m)).join(''));
     }
     document.querySelector('button#getMeals').addEventListener('click', getMeals);
 
@@ -106,7 +111,7 @@
         fetch("/manager/createMeal", {
             method: 'POST',
             credentials: "include",
-            body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, mess: m}),
+            body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, mess: m }),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -118,9 +123,9 @@
                     document.querySelector('div#createError').innerHTML += '<br>Assigning all';
                     fetch("/manager/bulkCreateMealToken", {
                         method: 'POST',
-                        credentials:"include",
-                        body: JSON.stringify({meal_id: id}),
-                        headers: { 'Content-Type': 'application/json' } 
+                        credentials: "include",
+                        body: JSON.stringify({ meal_id: id }),
+                        headers: { 'Content-Type': 'application/json' }
                     }).then(async res => {
                         if (res.status === 201) {
                             document.querySelector('div#createError').innerHTML += '<br> Assigned to all users!';
@@ -130,7 +135,7 @@
                     })
                 }
             } else {
-                document.querySelector('div#createError').innerText = await response.text(); 
+                document.querySelector('div#createError').innerText = await response.text();
             }
         });
     }

@@ -110,7 +110,10 @@ export class ManagerService {
 		} else if (limit > 0) {
 			return this.mealModel.find({ start_time: { $gt: date } }).limit(limit);
 		} else {
-			return this.mealModel.find({ end_time: { $lt: date } }).limit(0 - limit);
+			return this.mealModel
+				.find({ end_time: { $lt: date } })
+				.sort({ end_time: -1 })
+				.limit(0 - limit);
 		}
 	}
 
