@@ -14,13 +14,13 @@
         <div class="form">
             <div class="input-group mb-3">
                 <span class="input-group-text">Kerberos</span>
-                <select class="form-control" id="create_kerberos" aria-label="Meal">
+                <select class="form-control" id="create_kerberos" aria-label="Kerberos">
                     <option value=""></option>
                 </select>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text">Meal</span>
-                <select class="form-control" id="create_meal" aria-label="Mess">
+                <select class="form-control" id="create_meal" aria-label="Meal">
                     <option value=""></option>
                 </select>
             </div>
@@ -99,16 +99,25 @@
         document.querySelector('select#create_meal').innerHTML = '';
         fetch("/manager/getMeals?limit=0", { credentials : "include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#create_meal').innerHTML += data.map(
-                m => mealOption(m)).join(''));
+        ).then(data => {
+            document.querySelector('select#create_meal').innerHTML += data.map(
+                m => mealOption(m)).join('');
+            Select2('select#create_meal');
+        });
         fetch("/manager/getMeals?limit=10", { credentials : "include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#create_meal').innerHTML += data.map(
-                m => mealOption(m)).join(''));
+        ).then(data => {
+            document.querySelector('select#create_meal').innerHTML += data.map(
+                m => mealOption(m)).join('');
+            Select2('select#create_meal');
+        });
         fetch("/manager/getUsers", {credentials:"include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#create_kerberos').innerHTML = data.map(
-                u => userActiveOption(u)).join(''));
+        ).then(data => {
+            document.querySelector('select#create_kerberos').innerHTML = data.map(
+                u => userActiveOption(u)).join('');
+            Select2('select#create_kerberos');
+        });
     }
     updateCreateMealOptions();
 
@@ -137,20 +146,32 @@
         document.querySelector('select#get_kerberos').innerHTML = '';
         fetch("/manager/getMeals?limit=0", { credentials : "include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
-                m => mealOption(m)).join(''));
+        ).then(data => {
+            document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join('');
+            Select2('select#get_meal');
+        });
         fetch("/manager/getMeals?limit=15", { credentials : "include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
-                m => mealOption(m)).join(''));
+        ).then(data => {
+            document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join('');
+            Select2('select#get_meal');
+        });
         fetch("/manager/getMeals?limit=-15", { credentials : "include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#get_meal').innerHTML += data.map(
-                m => mealOption(m)).join(''));
+        ).then(data => {
+            document.querySelector('select#get_meal').innerHTML += data.map(
+                m => mealOption(m)).join('');
+            Select2('select#get_meal');
+        });
         fetch("/manager/getUsers", {credentials:"include"}
             ).then(response => response.json()
-            ).then(data => document.querySelector('select#get_kerberos').innerHTML = data.map(
-                u => userOption(u)).join(''));
+        ).then(data => {
+            document.querySelector('select#get_kerberos').innerHTML = data.map(
+                u => userOption(u)).join('');
+            Select2('select#get_kerberos');
+        });
     }
     updateGetMealOptions();
 
