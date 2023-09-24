@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import * as session from 'express-session';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import CONFIG from './config';
+import CONFIG from './utils/config';
 import { join } from 'path';
 import * as hbs from 'hbs';
 

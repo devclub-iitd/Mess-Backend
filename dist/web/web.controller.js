@@ -35,6 +35,9 @@ let WebController = class WebController {
     mealtokens(req, res) {
         return { user: req.session.user };
     }
+    rebate(req, res) {
+        return { user: req.session.user };
+    }
 };
 __decorate([
     (0, common_1.Get)(),
@@ -89,6 +92,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], WebController.prototype, "mealtokens", null);
+__decorate([
+    (0, common_1.Get)('rebate'),
+    (0, common_1.Render)('rebate'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], WebController.prototype, "rebate", null);
 WebController = __decorate([
     (0, common_1.Controller)('web')
 ], WebController);

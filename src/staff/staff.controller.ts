@@ -59,6 +59,8 @@ export class StaffController {
 			throw new NotFoundException('No such meal token');
 		} else if (x === -1) {
 			throw new ForbiddenException('Meal token already used');
+		} else if (x === -2) {
+			throw new ForbiddenException('User is on REBATE');
 		} else {
 			return x;
 		}

@@ -41,4 +41,13 @@ export declare class WebController {
             role: string;
         };
     };
+    rebate(req: Request, res: Response): {
+        user: {
+            id: string;
+            kerberos: string;
+            isManager: boolean;
+            name: string;
+            role: string;
+        };
+    };
 }

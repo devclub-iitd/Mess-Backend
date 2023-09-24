@@ -120,6 +120,9 @@ export class StaffService {
 		if (doc.status === 'USED') {
 			return -1;
 		}
+		if (doc.status === 'REBATE') {
+			return -2;
+		}
 		doc.status = 'USED';
 		doc.enter_time = new Date();
 		return doc.save();

@@ -16,7 +16,7 @@ const auth_module_1 = require("./auth/auth.module");
 const manager_module_1 = require("./manager/manager.module");
 const staff_module_1 = require("./staff/staff.module");
 const web_module_1 = require("./web/web.module");
-const config_1 = require("./config");
+const config_1 = require("./utils/config");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([

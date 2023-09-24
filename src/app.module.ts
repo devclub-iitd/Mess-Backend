@@ -7,7 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ManagerModule } from './manager/manager.module';
 import { StaffModule } from './staff/staff.module';
 import { WebModule } from './web/web.module';
-import CONFIG from './config';
+import CONFIG from './utils/config';
 
 @Module({
 	imports: [

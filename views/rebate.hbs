@@ -1,0 +1,98 @@
+{{> base_start}}
+{{> protected}}
+
+<h1>Rebates</h1>
+<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createRebateModal">Create Rebates</button>
+<button class="btn btn-primary" id="getRebates">Get Rebates</button>
+<div class = "container my-4" id="rebates"></div>
+<div class="modal" tabindex="-1" id="createRebateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Rebates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
+      </div>
+      <div class="modal-body">
+        Please download rebate Excel file from ERP
+        <div class="form">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Excel File</span>
+                <input type="file" id="create_rebates" class="form-control" placeholder="Excel File" aria-label="Kerberos">
+            </div>
+            <div id="createError"></div>
+            </div>
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createRebates">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+<script>
+    const k2E = (kerberos) => `20${kerberos.slice(3,5)}${kerberos.slice(0,3).toUpperCase()}${kerberos.slice(5,9)}`
+    const activeNow = (from, to) => new Date(from) < new Date() && new Date(to) > new Date();
+ 
+    function templateRebateCard(
+        entry_no,
+        user_name,
+        rebate_application_no,
+        from_date,
+        to_date,
+        days,
+        approval_status,
+        reason,
+        type, 
+        amount,
+        isActive
+    ) {
+        return `
+        <div class='row ${isActive? 'bg-danger' : 'bg-light'} m-2' id='rebate_${rebate_application_no}'>
+            <div class='col'>${rebate_application_no}</div>
+            <div class='col'>${entry_no}</div>
+            <div class='col'>${user_name}</div>
+            <div class='col'>${from_date}</div>
+            <div class='col'>${to_date}</div>
+            <div class='col'>${approval_status}</div>
+            <div class='col'>${reason}</div>
+        </div>`;
+    }
+
+    function getRebates() {
+        document.querySelector('div#rebates').innerHTML = "<div class='spinner-border' role='status'>";
+        fetch("/manager/getRebates", { credentials : "include"})
+            .then(response => response.json())
+            .then(data => document.querySelector('div#rebates').innerHTML = data.map(
+                r => templateRebateCard(
+                    k2E(r.user_id.kerberos), 
+                    r.user_id.name, 
+                    r.rebate_application_no,
+                    new Date(r.from_date).toLocaleDateString(),
+                    new Date(r.to_date).toLocaleDateString(),
+                    r.days,
+                    r.approval_status,
+                    r.reason,
+                    r.type,
+                    r.amount,
+                    activeNow(r.from_date, r.to_date)
+                )
+                ).join(''));
+    }
+    document.querySelector('button#getRebates').addEventListener('click', getRebates);
+
+    function createRebates() {
+        const input = document.querySelector('input#create_rebates');
+        const formData = new FormData();
+        formData.append('file', input.files[0]);
+        const response = fetch(`/manager/bulkCreateRebates`, {
+            method: 'POST',
+            body: formData
+        }).finally(getRebates);
+        document.querySelector("button#closeModal").click();
+    }
+    document.querySelector('button#createRebates').addEventListener('click', createRebates);
+    window.onload = getRebates
+</script>
+{{> base_end}}

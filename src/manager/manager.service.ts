@@ -3,19 +3,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
 import { AccessToken, AccessTokenDocument } from 'src/schemas/accesstoken.schema';
-// import { Admin, AdminDocument } from 'src/schemas/admin.schema';
+import { Admin, AdminDocument } from 'src/schemas/admin.schema';
 import { FoodItem, FoodItemDocument } from 'src/schemas/fooditem.schema';
 import { Meal, MealDocument } from 'src/schemas/meal.schema';
 import { MealToken, MealTokenDocument } from 'src/schemas/mealtoken.schema';
 import { RawMaterial, RawMaterialDocument } from 'src/schemas/rawmaterial.schema';
+import { Rebate, RebateDocument } from 'src/schemas/rebate.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
+import { parseRebate } from 'src/utils/parseExcel';
 
 @Injectable()
 export class ManagerService {
 	constructor(
 		@InjectModel(AccessToken.name)
 		private accessTokenModel: Model<AccessTokenDocument>,
-		// @InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
+		@InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
 		@InjectModel(FoodItem.name) private foodItemModel: Model<FoodItemDocument>,
 		@InjectModel(Meal.name) private mealModel: Model<MealDocument>,
 		@InjectModel(MealToken.name)
@@ -23,6 +25,7 @@ export class ManagerService {
 		@InjectModel(RawMaterial.name)
 		private rawMaterialModel: Model<RawMaterialDocument>,
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
+		@InjectModel(Rebate.name) private rebateModel: Model<RebateDocument>,
 	) {}
 
 	async createUser(kerberos: string, name: string, hostel: string) {
@@ -134,12 +137,23 @@ export class ManagerService {
 
 	async bulkCreateMealToken(meal_id: string, status: string) {
 		status = status || 'BOOKED';
-		const m = await this.mealModel.findById(meal_id).select('_id');
-		if (!m) {
+		const meal = await this.mealModel.findById(meal_id).select(['_id', 'end_time', 'start_time']);
+		if (!meal) {
 			return null;
 		}
 		const users = await this.userModel.find({ isActive: true }).select('_id');
-		const doc = users.map((u) => new this.mealTokenModel({ user_id: u, meal_id: m, status: status }));
+		const rebates = await this.rebateModel
+			.find({
+				from_date: { $lt: meal.end_time },
+				to_date: { $gt: meal.start_time },
+			})
+			.lean();
+
+		// TODO: Optimise with pipeline
+		const doc = users
+			.filter((user) => !rebates.find((rebate) => String(rebate.user_id) === String(user._id)))
+			.map((user) => new this.mealTokenModel({ user_id: user, meal_id: meal, status: status }));
+
 		return this.mealTokenModel.insertMany(doc);
 	}
 
@@ -153,5 +167,76 @@ export class ManagerService {
 		} else if (meal_id) {
 			return this.mealTokenModel.find({ meal_id: meal_id }).populate(['meal_id', 'user_id']);
 		}
+	}
+
+	async createRebate(
+		kerberos: string,
+		admin_id: string,
+		rebate_application_no: number,
+		from_date: Date,
+		to_date: Date,
+		approval_status: string,
+		days?: number,
+		reason?: string,
+		type?: string,
+		amount?: number,
+	): Promise<Rebate | 0 | -1> {
+		const user = await this.userModel.findOne({ kerberos }).lean();
+		if (!user) return 0;
+		const admin = await this.adminModel.findById(admin_id).lean();
+		if (!admin) return -1;
+		const old = await this.rebateModel.findOne({ rebate_application_no });
+		const meals = await this.mealModel.find({ start_time: { $gt: from_date }, end_time: { $lt: to_date } }).lean();
+		await this.mealTokenModel.updateMany(
+			{
+				user_id: user._id,
+				meal_id: { $in: meals.map((meal) => meal._id) },
+			},
+			{ $set: { status: 'REBATE' } },
+		);
+
+		const values = {
+			user_id: user._id,
+			admin_id: admin._id,
+			rebate_application_no,
+			from_date,
+			to_date,
+			days,
+			approval_status,
+			reason,
+			type,
+			amount,
+		};
+
+		if (old) {
+			return old.updateOne(values);
+		}
+
+		const doc = new this.rebateModel(values);
+		return doc.save();
+	}
+
+	async bulkCreateRebates(admin_id: string, file_path: string) {
+		const data = parseRebate(file_path);
+		const queries = data.map((row) =>
+			this.createRebate(
+				row.kerberos,
+				admin_id,
+				row.rebate_application_no,
+				row.from_date,
+				row.to_date,
+				row.approval_status,
+				row.days,
+				row.reason,
+				row.type,
+				row.amount,
+			),
+		);
+		return Promise.all(queries);
+	}
+
+	async getRebates() {
+		// TODO: Make it granular
+		return this.rebateModel.find({}).populate('user_id');
 	}
 }

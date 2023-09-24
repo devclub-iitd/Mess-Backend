@@ -58,6 +58,9 @@ let StaffController = class StaffController {
         else if (x === -1) {
             throw new common_1.ForbiddenException('Meal token already used');
         }
+        else if (x === -2) {
+            throw new common_1.ForbiddenException('User is on REBATE');
+        }
         else {
             return x;
         }

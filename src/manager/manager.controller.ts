@@ -1,7 +1,22 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Query, UseGuards } from '@nestjs/common';
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	Get,
+	NotFoundException,
+	Post,
+	Query,
+	Req,
+	UnauthorizedException,
+	UploadedFile,
+	UseGuards,
+	UseInterceptors,
+} from '@nestjs/common';
 import { AdminAuthGuard } from 'src/auth/passport/admin-auth.guard';
 import { ManagerAuthGuard } from 'src/auth/passport/manager-auth.guard';
 import { ManagerService } from './manager.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { parseRebate } from 'src/utils/parseExcel';
 
 @UseGuards(ManagerAuthGuard)
 @UseGuards(AdminAuthGuard)
@@ -90,5 +105,41 @@ export class ManagerController {
 	async getMealTokens(@Query() query) {
 		const { kerberos, meal_id } = query;
 		return this.managerService.getMealTokens(kerberos, meal_id);
+	}
+
+	@Post('createRebate')
+	async createRebate(@Body() body, @Req() req: Express.Request) {
+		const { kerberos, rebate_application_no, from_date, to_date, approval_status, days, reason, type, amount } = body;
+		const admin_id = req.session.user.id;
+		const result = await this.managerService.createRebate(
+			kerberos,
+			admin_id,
+			rebate_application_no,
+			new Date(from_date),
+			new Date(to_date),
+			approval_status,
+			days,
+			reason,
+			type,
+			amount,
+		);
+		if (result === 0) throw new NotFoundException();
+		if (result === -1) throw new UnauthorizedException();
+		return result;
+	}
+
+	@Post('bulkCreateRebates')
+	@UseInterceptors(FileInterceptor('file'))
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req: Express.Request) {
+		const admin_id = req.session.user.id;
+		const result = await this.managerService.bulkCreateRebates(admin_id, file.path);
+		if (result.find((r) => r === 0) === 0) throw new NotFoundException();
+		if (result.find((r) => r === -1)) throw new UnauthorizedException();
+		return result;
+	}
+
+	@Get('getRebates')
+	async getRebates() {
+		return this.managerService.getRebates();
 	}
 }

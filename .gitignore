@@ -2,6 +2,7 @@
 scripts/data
 scripts/outputs
 scripts/logs
+upload/
 
 # https://devcenter.heroku.com/articles/migrating-to-yarn-2#local-setup
 .pnp.*

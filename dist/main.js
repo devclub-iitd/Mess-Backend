@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const session = require("express-session");
 const app_module_1 = require("./app.module");
-const config_1 = require("./config");
+const config_1 = require("./utils/config");
 const path_1 = require("path");
 const hbs = require("hbs");
 async function bootstrap() {

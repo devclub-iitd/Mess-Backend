@@ -40,4 +40,10 @@ export class WebController {
 	mealtokens(@Req() req: Request, @Res() res: Response) {
 		return { user: req.session.user };
 	}
+
+	@Get('rebate')
+	@Render('rebate')
+	rebate(@Req() req: Request, @Res() res: Response) {
+		return { user: req.session.user };
+	}
 }

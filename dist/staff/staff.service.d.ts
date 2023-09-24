@@ -33,7 +33,7 @@ export declare class StaffService {
     private mealTokenModel;
     private mealModel;
     constructor(userModel: Model<UserDocument>, accessTokenModel: Model<AccessTokenDocument>, mealTokenModel: Model<MealTokenDocument>, mealModel: Model<MealDocument>);
-    verifyToken(kerberos: string, token: string): Promise<-1 | 0 | {
+    verifyToken(kerberos: string, token: string): Promise<0 | -1 | {
         token: {
             user_id: {
                 name: any;
@@ -58,7 +58,7 @@ export declare class StaffService {
     getMealTokens(kerberos: string): Promise<Omit<import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
     }, never>[]>;
-    useMealToken(id: string): Promise<-1 | 0 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
+    useMealToken(id: string): Promise<0 | -1 | (import("mongoose").Document<unknown, any, MealTokenDocument> & MealToken & Document & {
         _id: import("mongoose").Types.ObjectId;
-    })>;
+    }) | -2>;
 }

@@ -8,6 +8,10 @@ import { RawMaterial, RawMaterialSchema } from 'src/schemas/rawmaterial.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { ManagerController } from './manager.controller';
 import { ManagerService } from './manager.service';
+import { Rebate, RebateSchema } from 'src/schemas/rebate.schema';
+import { MulterModule } from '@nestjs/platform-express';
+import { Admin } from 'mongodb';
+import { AdminSchema } from 'src/schemas/admin.schema';
 
 @Module({
 	imports: [
@@ -18,7 +22,10 @@ import { ManagerService } from './manager.service';
 			{ name: MealToken.name, schema: MealTokenSchema },
 			{ name: RawMaterial.name, schema: RawMaterialSchema },
 			{ name: User.name, schema: UserSchema },
+			{ name: Rebate.name, schema: RebateSchema },
+			{ name: Admin.name, schema: AdminSchema },
 		]),
+		MulterModule.register({ dest: './upload' }),
 	],
 	controllers: [ManagerController],
 	providers: [ManagerService],

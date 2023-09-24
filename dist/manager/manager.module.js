@@ -17,6 +17,10 @@ const rawmaterial_schema_1 = require("../schemas/rawmaterial.schema");
 const user_schema_1 = require("../schemas/user.schema");
 const manager_controller_1 = require("./manager.controller");
 const manager_service_1 = require("./manager.service");
+const rebate_schema_1 = require("../schemas/rebate.schema");
+const platform_express_1 = require("@nestjs/platform-express");
+const mongodb_1 = require("mongodb");
+const admin_schema_1 = require("../schemas/admin.schema");
 let ManagerModule = class ManagerModule {
 };
 ManagerModule = __decorate([
@@ -29,7 +33,10 @@ ManagerModule = __decorate([
                 { name: mealtoken_schema_1.MealToken.name, schema: mealtoken_schema_1.MealTokenSchema },
                 { name: rawmaterial_schema_1.RawMaterial.name, schema: rawmaterial_schema_1.RawMaterialSchema },
                 { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
+                { name: rebate_schema_1.Rebate.name, schema: rebate_schema_1.RebateSchema },
+                { name: mongodb_1.Admin.name, schema: admin_schema_1.AdminSchema },
             ]),
+            platform_express_1.MulterModule.register({ dest: './upload' }),
         ],
         controllers: [manager_controller_1.ManagerController],
         providers: [manager_service_1.ManagerService],

@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const admin_auth_guard_1 = require("../auth/passport/admin-auth.guard");
 const manager_auth_guard_1 = require("../auth/passport/manager-auth.guard");
 const manager_service_1 = require("./manager.service");
+const platform_express_1 = require("@nestjs/platform-express");
 let ManagerController = class ManagerController {
     constructor(managerService) {
         this.managerService = managerService;
@@ -86,6 +87,28 @@ let ManagerController = class ManagerController {
         const { kerberos, meal_id } = query;
         return this.managerService.getMealTokens(kerberos, meal_id);
     }
+    async createRebate(body, req) {
+        const { kerberos, rebate_application_no, from_date, to_date, approval_status, days, reason, type, amount } = body;
+        const admin_id = req.session.user.id;
+        const result = await this.managerService.createRebate(kerberos, admin_id, rebate_application_no, new Date(from_date), new Date(to_date), approval_status, days, reason, type, amount);
+        if (result === 0)
+            throw new common_1.NotFoundException();
+        if (result === -1)
+            throw new common_1.UnauthorizedException();
+        return result;
+    }
+    async uploadFile(file, req) {
+        const admin_id = req.session.user.id;
+        const result = await this.managerService.bulkCreateRebates(admin_id, file.path);
+        if (result.find((r) => r === 0) === 0)
+            throw new common_1.NotFoundException();
+        if (result.find((r) => r === -1))
+            throw new common_1.UnauthorizedException();
+        return result;
+    }
+    async getRebates() {
+        return this.managerService.getRebates();
+    }
 };
 __decorate([
     (0, common_1.Post)('createUser'),
@@ -149,6 +172,29 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ManagerController.prototype, "getMealTokens", null);
+__decorate([
+    (0, common_1.Post)('createRebate'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ManagerController.prototype, "createRebate", null);
+__decorate([
+    (0, common_1.Post)('bulkCreateRebates'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ManagerController.prototype, "uploadFile", null);
+__decorate([
+    (0, common_1.Get)('getRebates'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ManagerController.prototype, "getRebates", null);
 ManagerController = __decorate([
     (0, common_1.UseGuards)(manager_auth_guard_1.ManagerAuthGuard),
     (0, common_1.UseGuards)(admin_auth_guard_1.AdminAuthGuard),

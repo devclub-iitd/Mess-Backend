@@ -1,3 +1,6 @@
+/// <reference types="express-serve-static-core" />
+/// <reference types="express-session" />
+/// <reference types="multer" />
 /// <reference types="mongoose/types/aggregate" />
 /// <reference types="mongoose/types/callback" />
 /// <reference types="mongoose/types/collection" />
@@ -60,6 +63,11 @@ export declare class ManagerController {
         _id: import("mongoose").Types.ObjectId;
     }>)[]>;
     getMealTokens(query: any): Promise<Omit<import("mongoose").Document<unknown, any, import("../schemas/mealtoken.schema").MealTokenDocument> & import("../schemas/mealtoken.schema").MealToken & Document & {
+        _id: import("mongoose").Types.ObjectId;
+    }, never>[]>;
+    createRebate(body: any, req: Express.Request): Promise<import("../schemas/rebate.schema").Rebate>;
+    uploadFile(file: Express.Multer.File, req: Express.Request): Promise<(0 | -1 | import("../schemas/rebate.schema").Rebate)[]>;
+    getRebates(): Promise<Omit<import("mongoose").Document<unknown, any, import("../schemas/rebate.schema").RebateDocument> & import("../schemas/rebate.schema").Rebate & Document & {
         _id: import("mongoose").Types.ObjectId;
     }, never>[]>;
 }
