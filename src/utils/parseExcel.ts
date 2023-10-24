@@ -13,7 +13,7 @@ export const parseRebate = (path: string) => {
 		kerberos: entry2kerberos(row['Entry Number']),
 		rebate_application_no: row['Rebate Application No.'],
 		from_date: new Date(row['From Date']),
-		to_date: new Date(row['To Date']),
+		to_date: new Date(Number(new Date(row['To Date'])) + 24 * 60 * 60 * 1000 - 1),
 		approval_status: row['Approval Status'],
 		days: row['Days'],
 		reason: row['Reason For Rebate'],
