@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - PORT=8080
+      - MONGODB_STRING=$MONGODB_STRING
+      - MONGODB_DATABASE=$MONGODB_DATABASE
+      # - JWT_SECRET=$JWT_SECRET
+      - SESSION_SECRET=$SESSION_SECRET
+      # - BCRYPT_ROUNDS=$BCRYPT_ROUNDS
+      # - REDIS_PORT=6379
+      # - REDIS_HOST=redis
+    volumes:
+      - .:/home/node/app
+    ports:
+      - 8080:8080
+    links:
+      - mongodb
+      # - redis
+  # redis:
+  #   image: redis:alpine
+  #   restart: always
+  #   ports:
+  #     - 6379:6379
+  nginx:
+    image: nginx:stable
+    restart: always
+    ports:
+      - 80:80
+      # - 443:443
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      # - /etc/letsencrypt/:/etc/letsencrypt/
+    links:
+      - web
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=$MONGODB_USERNAME
+      - MONGODB_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+    volumes:
+      - type: bind
+        source: ./docker/mongodb/data
+        target: /data
