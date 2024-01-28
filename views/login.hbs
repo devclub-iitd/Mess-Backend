@@ -16,7 +16,7 @@
     document.querySelector('button#submit').addEventListener('click', () => {
         const k = document.querySelector("input#username").value;
         const p = document.querySelector("input#password").value;
-        fetch('/auth/login', {
+        fetch('/api/auth/login', {
             method: 'POST',
             body: JSON.stringify({"kerberos": k, "password": p}),
             headers: {

@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  web:
-    container_name: web
+  api:
+    container_name: api
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,7 +41,7 @@ services:
       - ./docker/nginx:/etc/nginx/conf.d
       # - /etc/letsencrypt/:/etc/letsencrypt/
     links:
-      - web
+      - api
   mongodb:
     image: mongodb/mongodb-community-server:latest
     restart: always

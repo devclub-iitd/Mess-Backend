@@ -97,21 +97,21 @@
 
     function updateCreateMealOptions() {
         document.querySelector('select#create_meal').innerHTML = '';
-        fetch("/manager/getMeals?limit=0", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=0", { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#create_meal');
         });
-        fetch("/manager/getMeals?limit=10", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=10", { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#create_meal');
         });
-        fetch("/manager/getUsers", {credentials:"include"}
+        fetch("/api/manager/getUsers", {credentials:"include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_kerberos').innerHTML = data.map(
@@ -124,7 +124,7 @@
     function createMealToken() {
         const k = document.querySelector('select#create_kerberos').value;
         const m = document.querySelector('select#create_meal').value;
-        fetch("/manager/createMealToken", {
+        fetch("/api/manager/createMealToken", {
             method: 'POST',
             credentials: "include",
             body: JSON.stringify({kerberos: k, meal_id: m}),
@@ -144,28 +144,28 @@
     function updateGetMealOptions() {
         document.querySelector('select#get_meal').innerHTML = '';
         document.querySelector('select#get_kerberos').innerHTML = '';
-        fetch("/manager/getMeals?limit=0", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=0", { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/manager/getMeals?limit=15", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=15", { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/manager/getMeals?limit=-15", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=-15", { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/manager/getUsers", {credentials:"include"}
+        fetch("/api/manager/getUsers", {credentials:"include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_kerberos').innerHTML = data.map(
@@ -180,7 +180,7 @@
         document.querySelector('span#token_count').innerText = 0;
         document.querySelector('span#token_used').innerText = 0;
         document.querySelector('div#mealtokens').innerHTML = "<div class='spinner-border' role='status'>";
-        fetch("/manager/getMealTokens?meal_id="+m, {credentials:"include"}
+        fetch("/api/manager/getMealTokens?meal_id="+m, {credentials:"include"}
             ).then(response => response.json()
             ).then(data => {
                 document.querySelector('span#token_count').innerText = data.length;
@@ -195,7 +195,7 @@
         document.querySelector('span#token_count').innerText = 0;
         document.querySelector('span#token_used').innerText = 0;
         document.querySelector('div#mealtokens').innerHTML = "<div class='spinner-border' role='status'>";
-        fetch("/manager/getMealTokens?kerberos="+k, {credentials:"include"}
+        fetch("/api/manager/getMealTokens?kerberos="+k, {credentials:"include"}
             ).then(response => response.json()
             ).then(data => {
                 document.querySelector('span#token_count').innerText = data.length;

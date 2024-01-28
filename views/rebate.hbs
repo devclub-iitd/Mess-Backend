@@ -62,7 +62,7 @@
 
     function getRebates() {
         document.querySelector('div#rebates').innerHTML = "<div class='spinner-border' role='status'>";
-        fetch("/manager/getRebates", { credentials : "include"})
+        fetch("/api/manager/getRebates", { credentials : "include"})
             .then(response => response.json())
             .then(data => document.querySelector('div#rebates').innerHTML = data.map(
                 r => templateRebateCard(

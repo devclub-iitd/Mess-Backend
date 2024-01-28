@@ -82,7 +82,7 @@
 
     function getUsers() {
         document.querySelector('div#users').innerHTML = "<div class='spinner-border' role='status'>";
-        fetch("/manager/getUsers", { credentials : "include"}
+        fetch("/api/manager/getUsers", { credentials : "include"}
             ).then(response => response.json()
             ).then(data => document.querySelector('div#users').innerHTML = data.map(
                 u => templateUserCard(u['id'], u['name'], u['hostel'], u['kerberos'], u['isActive'])
@@ -94,7 +94,7 @@
         const k = document.querySelector('input#create_kerberos').value;
         const n = document.querySelector('input#create_name').value;
         const h = document.querySelector('select#create_hostel').value;
-        fetch("/manager/createUser", {
+        fetch("/api/manager/createUser", {
             method: 'POST',
             credentials: "include",
             body: JSON.stringify({kerberos: k, name: n, hostel: h}),

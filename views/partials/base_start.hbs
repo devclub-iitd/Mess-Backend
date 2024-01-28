@@ -37,28 +37,28 @@
 					</li>
 					{{#if user}}
 					<li class="nav-item">
-					<a class="nav-link" href="/web/users">Users</a>
+					<a class="nav-link" href="/api/web/users">Users</a>
 					</li>
 					<li class="nav-item">
-					<a class="nav-link" href="/web/meals">Meals</a>
+					<a class="nav-link" href="/api/web/meals">Meals</a>
 					</li>
 					<li class="nav-item">
-					<a class="nav-link" href="/web/mealtokens">Consumption</a>
+					<a class="nav-link" href="/api/web/mealtokens">Consumption</a>
 					</li>
 					<li class="nav-item">
-					<a class="nav-link" href="/web/rebate">Rebate</a>
+					<a class="nav-link" href="/api/web/rebate">Rebate</a>
 					</li>
 					{{/if}}
 				</ul>
 				{{#if user}}
 				<div class="text-white px-4">Logged in as <code>{{user.name}}</code></div>
-				<a class="nav-link" href="/web/logout">
+				<a class="nav-link" href="/api/web/logout">
 					<button class="btn btn-light">
 						Logout
 					</button>
 				</a>
 				{{^}}
-				<a class="nav-link" href="/web/login">
+				<a class="nav-link" href="/api/web/login">
 					<button class="btn btn-light">
 						Login
 					</button>

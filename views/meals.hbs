@@ -84,15 +84,15 @@
         document.querySelector('div#future_meals').innerHTML = "<div class='spinner-border' role='status'>";
         document.querySelector('div#past_meals').innerHTML = "<div class='spinner-border' role='status'>";
         const d = (new Date()).toString();
-        fetch("/manager/getMeals?limit=0", { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=0", { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=10", { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=10", { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=-10", { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=-10", { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
@@ -108,7 +108,7 @@
         const p = document.querySelector('input#create_price').value;
         const m = document.querySelector('select#create_mess').value;
         const a = document.querySelector('input#create_all').checked;
-        fetch("/manager/createMeal", {
+        fetch("/api/manager/createMeal", {
             method: 'POST',
             credentials: "include",
             body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, mess: m }),
@@ -121,7 +121,7 @@
                 if (a) {
                     const id = (await response.json())['_id'];
                     document.querySelector('div#createError').innerHTML += '<br>Assigning all';
-                    fetch("/manager/bulkCreateMealToken", {
+                    fetch("/api/manager/bulkCreateMealToken", {
                         method: 'POST',
                         credentials: "include",
                         body: JSON.stringify({ meal_id: id }),

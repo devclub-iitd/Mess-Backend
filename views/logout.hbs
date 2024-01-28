@@ -2,7 +2,7 @@
 <h1>Logout</h1>
 <div id='error'></div>
 <script>
-	fetch('/auth/logout', { method: 'POST' }).then(response => { 
+	fetch('/api/auth/logout', { method: 'POST' }).then(response => { 
         if (response.status === 201) {
             window.location.href = '/'; 
         } 
