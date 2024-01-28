@@ -19,6 +19,7 @@ services:
       - REDIS_PASSWORD=$REDIS_PASSWORD
     volumes:
       - .:/home/node/app
+      - ./docker/media:$MULTER_MEDIA_DESTINATION
     ports:
       - 8080:8080
     links:

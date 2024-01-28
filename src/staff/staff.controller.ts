@@ -5,13 +5,25 @@ import {
 	ForbiddenException,
 	Get,
 	NotFoundException,
+	Param,
 	Post,
 	Query,
 	Req,
+	StreamableFile,
+	UploadedFile,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
 import { AdminAuthGuard } from 'src/auth/passport/admin-auth.guard';
 import { StaffService } from './staff.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import CONFIG from 'src/utils/config';
+
+import { join } from 'path';
+import { createReadStream, existsSync } from 'fs';
+import sharp from 'sharp';
+import { generatePath } from 'src/utils/utils';
 
 @UseGuards(AdminAuthGuard)
 @Controller('staff')
@@ -63,5 +75,36 @@ export class StaffController {
 		if (x === -3) throw new ForbiddenException('User is on REBATE');
 
 		return x;
+	}
+
+	@Post('uploadPhoto')
+	@UseInterceptors(
+		FileInterceptor('file', {
+			storage: diskStorage({ destination: CONFIG.MULTER_MEDIA_DESTINATION }),
+		}),
+	)
+	async uploadPhoto(@Body() body, @Req() req: Express.Request, @UploadedFile() file: Express.Multer.File) {
+		const { kerberos } = body;
+
+		const filePath = generatePath(CONFIG.MULTER_MEDIA_DESTINATION, 'jpg');
+		await sharp(file.path).resize(480).jpeg({ quality: 60 }).toFile(filePath);
+
+		const x = await this.staffService.uploadPhoto(kerberos, filePath, req.session.user.messNames);
+
+		if (x === -1) throw new NotFoundException('No such student');
+		if (x === -2) throw new ForbiddenException('Staff does not have access to this mess');
+
+		return x;
+	}
+
+	@Get('photo/:uri')
+	async serveMedia(@Param() params) {
+		const { uri } = params;
+		const path = join(CONFIG.MULTER_MEDIA_DESTINATION, uri);
+		if (!existsSync(path)) {
+			throw new NotFoundException('File does not exist');
+		}
+		const file = createReadStream(path);
+		return new StreamableFile(file);
 	}
 }

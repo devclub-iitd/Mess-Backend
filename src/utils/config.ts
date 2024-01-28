@@ -7,6 +7,7 @@ const CONFIG = {
 	REDIS_HOST: process.env.REDIS_HOST,
 	REDIS_PORT: process.env.REDIS_PORT,
 	REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+	MULTER_MEDIA_DESTINATION: process.env.MULTER_MEDIA_DESTINATION,
 };
 
 export default CONFIG;

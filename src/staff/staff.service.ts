@@ -70,6 +70,7 @@ export class StaffService {
 					kerberos: user.kerberos,
 					hostel: user.hostel,
 					isActive: user.isActive,
+					photo: user.photo,
 				},
 			},
 			active_meals: user.meals.flatMap((meal: any) =>
@@ -123,5 +124,13 @@ export class StaffService {
 		doc.status = 'USED';
 		doc.enter_time = new Date();
 		return doc.save();
+	}
+
+	async uploadPhoto(kerberos: string, filename: string, adminMessNames: string[]) {
+		const u = await this.userModel.findOne({ kerberos }).populate('mess_id');
+		if (!u) return -1;
+		if (!adminMessNames.find((d) => d === u.mess_id.name)) return -2;
+		u.photo = filename;
+		return u.save();
 	}
 }
