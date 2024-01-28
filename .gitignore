@@ -15,7 +15,7 @@ upload/
 !.yarn/versions
 
 # compiled output
-# /dist
+/dist
 /node_modules
 
 # Logs

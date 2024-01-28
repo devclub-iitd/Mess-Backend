@@ -14,20 +14,22 @@ services:
       # - JWT_SECRET=$JWT_SECRET
       - SESSION_SECRET=$SESSION_SECRET
       # - BCRYPT_ROUNDS=$BCRYPT_ROUNDS
-      # - REDIS_PORT=6379
-      # - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=$REDIS_PASSWORD
     volumes:
       - .:/home/node/app
     ports:
       - 8080:8080
     links:
       - mongodb
-      # - redis
-  # redis:
-  #   image: redis:alpine
-  #   restart: always
-  #   ports:
-  #     - 6379:6379
+      - redis
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass $REDIS_PASSWORD
   nginx:
     image: nginx:stable
     restart: always

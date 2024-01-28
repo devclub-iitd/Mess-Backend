@@ -12,12 +12,14 @@ import { Rebate, RebateSchema } from 'src/schemas/rebate.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import { Admin } from 'mongodb';
 import { AdminSchema } from 'src/schemas/admin.schema';
+import { Mess, MessSchema } from 'src/schemas/mess.schema';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([
 			{ name: AccessToken.name, schema: AccessTokenSchema },
 			{ name: FoodItem.name, schema: FoodItemSchema },
+			{ name: Mess.name, schema: MessSchema },
 			{ name: Meal.name, schema: MealSchema },
 			{ name: MealToken.name, schema: MealTokenSchema },
 			{ name: RawMaterial.name, schema: RawMaterialSchema },
