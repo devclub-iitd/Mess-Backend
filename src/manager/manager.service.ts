@@ -7,8 +7,9 @@ import { Admin, AdminDocument } from 'src/schemas/admin.schema';
 import { FoodItem, FoodItemDocument } from 'src/schemas/fooditem.schema';
 import { Meal, MealDocument } from 'src/schemas/meal.schema';
 import { MealToken, MealTokenDocument } from 'src/schemas/mealtoken.schema';
+import { Mess, MessDocument } from 'src/schemas/mess.schema';
 import { RawMaterial, RawMaterialDocument } from 'src/schemas/rawmaterial.schema';
-import { Rebate, RebateDocument } from 'src/schemas/rebate.schema';
+import { Rebate, RebateDocument, RebateSchema } from 'src/schemas/rebate.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { parseRebate } from 'src/utils/parseExcel';
 
@@ -26,24 +27,33 @@ export class ManagerService {
 		private rawMaterialModel: Model<RawMaterialDocument>,
 		@InjectModel(User.name) private userModel: Model<UserDocument>,
 		@InjectModel(Rebate.name) private rebateModel: Model<RebateDocument>,
+		@InjectModel(Mess.name) private messModel: Model<MessDocument>,
 	) {}
 
-	async createUser(kerberos: string, name: string, hostel: string) {
+	async createUser(kerberos: string, name: string, hostel: string, messName: string, adminMesses: string[]) {
 		const check = await this.userModel.findOne({ kerberos: kerberos });
-		if (check) {
-			return null;
-		}
+		if (check) return -1;
+
+		if (messName && !adminMesses.find((d) => d === messName)) return -2;
+
+		const mess = await this.messModel.findOne({ name: messName }).select('_id');
+		// if null, then no messName was provided, allow for students without assigned mess
+
 		const doc = new this.userModel({
 			kerberos: kerberos,
 			name: name,
 			hostel: hostel,
 			isActive: true,
+			mess_id: mess,
 		});
 		return doc.save();
 	}
 
-	async getUsers() {
-		const doc = await this.userModel.find();
+	async getUsers(messName?: string) {
+		const mess = await this.messModel.findOne({ name: messName }).select('_id');
+		if (messName && !mess) return -1;
+
+		const doc = await this.userModel.find({ mess_id: mess });
 		return doc.map((d) => ({
 			id: d.id,
 			name: d.name,
@@ -53,11 +63,12 @@ export class ManagerService {
 		}));
 	}
 
-	async createAccessToken(kerberos: string, scope: string) {
-		const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
-		if (!u) {
-			return null;
-		}
+	async createAccessToken(kerberos: string, scope: string, adminMesses: string[]) {
+		const u = await this.userModel.findOne({ kerberos: kerberos }).select(['_id', 'mess_id']).populate('mess_id');
+		if (!u) return -1;
+
+		if (u.mess_id && !adminMesses.find((d) => u.mess_id.name === d)) return -2;
+
 		scope = scope || 'full';
 		const seed = crypto.randomUUID() + kerberos + new Date().toDateString;
 		const token = crypto.createHash('sha256').update(seed).digest('hex');
@@ -71,16 +82,17 @@ export class ManagerService {
 		return doc.save();
 	}
 
-	async getAccessTokens(kerberos: string) {
-		const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
-		if (!u) {
-			return null;
-		}
+	async getAccessTokens(kerberos: string, adminMessNames: string[]) {
+		const u = await this.userModel.findOne({ kerberos: kerberos }).select(['_id', 'mess_id']).populate('mess_id');
+		if (!u) return -1;
+
+		if (u.mess_id && !adminMessNames.find((d) => u.mess_id.name === d)) return -2;
+
 		return this.accessTokenModel.find({ user_id: u }).populate('user_id');
 	}
 
 	async createMeal(
-		mess: string,
+		messName: string,
 		name: string,
 		start_time: Date,
 		end_time: Date,
@@ -88,11 +100,13 @@ export class ManagerService {
 		price: number,
 		fooditem_ids: string[],
 	) {
-		if (end_time < start_time) {
-			return null;
-		}
+		if (end_time < start_time) return -1;
+
+		const mess = await this.messModel.findOne({ name: messName });
+		if (!mess) return -2;
+
 		const doc = new this.mealModel({
-			mess: mess,
+			mess_id: mess,
 			name: name,
 			start_time: start_time,
 			end_time: end_time,
@@ -103,30 +117,35 @@ export class ManagerService {
 		return doc.save();
 	}
 
-	async getMeals(limit: number, date: Date) {
+	async getMeals(limit: number, date: Date, messName: string) {
+		const mess = await this.messModel.findOne({ name: messName });
+		if (!mess) return -1;
+
 		date = date || new Date();
 		if (limit === 0) {
 			return this.mealModel.find({
 				end_time: { $gt: date },
 				start_time: { $lt: date },
+				mess,
 			});
 		} else if (limit > 0) {
-			return this.mealModel.find({ start_time: { $gt: date } }).limit(limit);
+			return this.mealModel.find({ start_time: { $gt: date }, mess }).limit(limit);
 		} else {
 			return this.mealModel
-				.find({ end_time: { $lt: date } })
+				.find({ end_time: { $lt: date }, mess })
 				.sort({ end_time: -1 })
 				.limit(0 - limit);
 		}
 	}
 
-	async createMealToken(kerberos: string, meal_id: string, status: string) {
+	async createMealToken(kerberos: string, meal_id: string, status: string, adminMessNames: string[]) {
 		status = status || 'BOOKED';
 		const u = await this.userModel.findOne({ kerberos: kerberos }).select('_id');
-		const m = await this.mealModel.findById(meal_id).select('_id');
-		if (!u || !m) {
-			return null;
-		}
+		if (!u) return -1;
+		const m = await this.mealModel.findById(meal_id).select(['_id', 'mess_id']).populate('mess_id');
+		if (!m) return -2;
+		if (!adminMessNames.find((d) => d === m.name)) return -3;
+
 		const doc = new this.mealTokenModel({
 			user_id: u,
 			meal_id: m,
@@ -135,22 +154,28 @@ export class ManagerService {
 		return doc.save();
 	}
 
-	async bulkCreateMealToken(meal_id: string, status: string) {
+	async bulkCreateMealToken(meal_id: string, status: string, adminMessNames: string[]) {
 		status = status || 'BOOKED';
-		const meal = await this.mealModel.findById(meal_id).select(['_id', 'end_time', 'start_time']);
-		if (!meal) {
-			return null;
-		}
-		const users = await this.userModel.find({ isActive: true }).select('_id');
+		const meal = await this.mealModel
+			.findById(meal_id)
+			.select(['_id', 'end_time', 'start_time', 'mess_id'])
+			.populate('mess_id');
+		if (!meal) return -1;
+		if (!adminMessNames.find((d) => d === meal.mess_id.name)) return -2;
+
+		const users = await this.userModel.find({ isActive: true, mess_id: meal.mess_id }).select('_id');
 		const rebates = await this.rebateModel
 			.find({
 				from_date: { $lt: meal.end_time },
 				to_date: { $gt: meal.start_time },
 			})
+			.select('user_id')
 			.lean();
+		const oldMealTokens = await this.mealTokenModel.find({ meal_id: meal }).select('user_id');
 
 		// TODO: Optimise with pipeline
 		const doc = users
+			.filter((user) => !oldMealTokens.find((mealToken) => String(mealToken.user_id) !== String(user._id)))
 			.filter((user) => !rebates.find((rebate) => String(rebate.user_id) === String(user._id)))
 			.map((user) => new this.mealTokenModel({ user_id: user, meal_id: meal, status: status }));
 
@@ -235,8 +260,11 @@ export class ManagerService {
 		return Promise.all(queries);
 	}
 
-	async getRebates() {
+	async getRebates(messName: string) {
 		// TODO: Make it granular
-		return this.rebateModel.find({}).populate('user_id');
+		const mess = await this.messModel.findOne({ name: messName });
+		if (!mess) return -1;
+		const users = await this.userModel.find({ mess_id: mess });
+		return this.rebateModel.find({ user_id: { $in: users } }).populate('user_id');
 	}
 }

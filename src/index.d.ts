@@ -7,6 +7,7 @@ declare module 'express-session' {
 			isManager: boolean;
 			name: string;
 			role: string;
+			messNames: string[];
 		};
 	}
 }

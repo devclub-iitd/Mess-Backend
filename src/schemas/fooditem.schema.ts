@@ -8,8 +8,8 @@ export class FoodItem {
 	name: string;
 
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'RawMaterial',
+		type: [mongoose.Schema.Types.ObjectId],
+		ref: RawMaterial.name,
 	})
 	rawmaterial_ids: RawMaterial[];
 }

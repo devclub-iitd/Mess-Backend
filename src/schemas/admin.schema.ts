@@ -1,4 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Mess } from './mess.schema';
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+
+export const MESS_LIST = ['UDAIGIRI', 'HIMADRI', 'DRONAGIRI'];
 
 @Schema()
 export class Admin {
@@ -16,6 +21,12 @@ export class Admin {
 
 	@Prop({ required: true, default: false })
 	isManager: boolean;
+
+	@Prop({
+		type: [mongoose.Schema.Types.ObjectId],
+		ref: Mess.name,
+	})
+	mess_ids: Mess[];
 }
 
 export type AdminDocument = Admin & Document;

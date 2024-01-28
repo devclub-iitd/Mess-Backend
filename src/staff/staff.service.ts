@@ -109,20 +109,17 @@ export class StaffService {
 		return this.mealTokenModel.find({ user_id: u }).populate('meal_id');
 	}
 
-	async useMealToken(id: string) {
+	async useMealToken(id: string, adminMessNames: string[]) {
 		const a = new Date();
-		const doc = await this.mealTokenModel.findById(id);
+		const doc = await this.mealTokenModel.findById(id).populate('meal_id').populate('meal_id.mess_id');
 		const b = new Date();
 		console.log('mealTokenModel.findById(id)', b.valueOf() - a.valueOf());
-		if (!doc) {
-			return 0;
-		}
-		if (doc.status === 'USED') {
-			return -1;
-		}
-		if (doc.status === 'REBATE') {
-			return -2;
-		}
+
+		if (!doc) return 0;
+		if (!adminMessNames.find((d) => d === doc.meal_id.mess_id.name)) return -1;
+		if (doc.status === 'USED') return -2;
+		if (doc.status === 'REBATE') return -3;
+
 		doc.status = 'USED';
 		doc.enter_time = new Date();
 		return doc.save();

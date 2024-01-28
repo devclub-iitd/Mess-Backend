@@ -7,6 +7,7 @@ import {
 	NotFoundException,
 	Post,
 	Query,
+	Req,
 	UseGuards,
 } from '@nestjs/common';
 import { AdminAuthGuard } from 'src/auth/passport/admin-auth.guard';
@@ -49,20 +50,18 @@ export class StaffController {
 	}
 
 	@Post('useMealToken')
-	async useMealToken(@Body() body) {
+	async useMealToken(@Body() body, @Req() req: Express.Request) {
 		const a = new Date();
 		const { token_id } = body;
-		const x = await this.staffService.useMealToken(token_id);
+		const x = await this.staffService.useMealToken(token_id, req.session.user.messNames);
 		const b = new Date();
 		console.log('useMealToken', b.valueOf() - a.valueOf());
-		if (x === 0) {
-			throw new NotFoundException('No such meal token');
-		} else if (x === -1) {
-			throw new ForbiddenException('Meal token already used');
-		} else if (x === -2) {
-			throw new ForbiddenException('User is on REBATE');
-		} else {
-			return x;
-		}
+
+		if (x === 0) throw new NotFoundException('No such meal token');
+		if (x === -1) throw new ForbiddenException('Mess not allowed for this staff');
+		if (x === -2) throw new ForbiddenException('Meal token already used');
+		if (x === -3) throw new ForbiddenException('User is on REBATE');
+
+		return x;
 	}
 }

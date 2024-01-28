@@ -7,14 +7,14 @@ import { User } from './user.schema';
 export class MealToken {
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		ref: User.name,
 		required: true,
 	})
 	user_id: User;
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Meal',
+		ref: Meal.name,
 		required: true,
 	})
 	meal_id: Meal;

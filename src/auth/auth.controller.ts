@@ -31,8 +31,8 @@ export class AuthController {
 	@UseGuards(ManagerAuthGuard)
 	@Post('createAdmin')
 	async createAdmin(@Body() body) {
-		const { kerberos, password, name, role } = body;
-		const res = await this.authService.createAdmin(kerberos, password, name, role);
+		const { kerberos, password, name, role, messNames } = body;
+		const res = await this.authService.createAdmin(kerberos, password, name, role, messNames);
 		if (!res) {
 			throw new BadRequestException('User already exists');
 		}

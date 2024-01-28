@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	ForbiddenException,
 	Get,
 	NotFoundException,
 	Post,
@@ -16,7 +17,6 @@ import { AdminAuthGuard } from 'src/auth/passport/admin-auth.guard';
 import { ManagerAuthGuard } from 'src/auth/passport/manager-auth.guard';
 import { ManagerService } from './manager.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { parseRebate } from 'src/utils/parseExcel';
 
 @UseGuards(ManagerAuthGuard)
 @UseGuards(AdminAuthGuard)
@@ -25,79 +25,99 @@ export class ManagerController {
 	constructor(private readonly managerService: ManagerService) {}
 
 	@Post('createUser')
-	async createUser(@Body() body) {
-		const { kerberos, name, hostel } = body;
-		const x = await this.managerService.createUser(kerberos, name, hostel);
-		if (!x) {
-			throw new BadRequestException(`User with kerberos ${kerberos} already created`);
-		}
+	async createUser(@Body() body, @Req() req: Express.Request) {
+		const { kerberos, name, hostel, messName } = body;
+
+		const x = await this.managerService.createUser(kerberos, name, hostel, messName, req.session.user.messNames);
+
+		if (x === -1) throw new BadRequestException(`User with kerberos ${kerberos} already created`);
+
+		if (x === -2)
+			throw new ForbiddenException(
+				`Cannot create user in mess ${messName}. Permissions only for ${req.session.user.messNames}`,
+			);
+
 		return x;
 	}
 
 	@Get('getUsers')
-	async getUsers() {
-		return this.managerService.getUsers();
+	async getUsers(@Query() query) {
+		const { messName } = query;
+		const x = await this.managerService.getUsers(messName);
+		if (x === -1) throw new BadRequestException('Invalid messName ' + messName);
+
+		return x;
 	}
 
 	@Post('createAccessToken')
-	async createAccessToken(@Body() body) {
+	async createAccessToken(@Body() body, @Req() req: Express.Request) {
 		const { kerberos, scope } = body;
-		const x = await this.managerService.createAccessToken(kerberos, scope);
-		if (!x) {
-			throw new BadRequestException('User does not exist');
-		}
+		const x = await this.managerService.createAccessToken(kerberos, scope, req.session.user.messNames);
+
+		if (x === -1) throw new BadRequestException('User does not exist');
+		if (x === -2) throw new ForbiddenException(`Manager permissions only for ${req.session.user.messNames}`);
+
 		return x;
 	}
 
 	@Get('getAccessTokens')
-	async getAccessTokens(@Query() query) {
+	async getAccessTokens(@Query() query, @Req() req: Express.Request) {
 		const { kerberos } = query;
-		const x = await this.managerService.getAccessTokens(kerberos);
-		if (!x) {
-			throw new BadRequestException('User does not exist');
-		}
+		const x = await this.managerService.getAccessTokens(kerberos, req.session.user.messNames);
+
+		if (x === -1) throw new BadRequestException('User does not exist');
+		if (x === -2) throw new ForbiddenException("You don't have permissions to view this user");
+
 		return x;
 	}
 
 	@Post('createMeal')
-	async createMeal(@Body() body) {
-		const mess: string = body.mess;
+	async createMeal(@Body() body, @Req() req: Express.Request) {
+		const messName: string = body.mess;
+		if (!req.session.user.messNames.find((d) => d === messName))
+			throw new ForbiddenException(`Manager permissions only for ${req.session.user.messNames}`);
+
 		const name: string = body.name;
 		const start_time = new Date(body.start_time);
 		const end_time = new Date(body.end_time);
 		const capacity: number = body.capacity;
 		const price: number = body.price;
 		const fooditem_ids: string[] = body.fooditem_ids;
-		const x = await this.managerService.createMeal(mess, name, start_time, end_time, capacity, price, fooditem_ids);
-		if (!x) {
-			throw new BadRequestException();
-		}
+		const x = await this.managerService.createMeal(messName, name, start_time, end_time, capacity, price, fooditem_ids);
+
+		if (x === -1) throw new BadRequestException(`Start date should be less than end date`);
+		if (x === -2) throw new NotFoundException(`No such mess ${messName}`);
+
 		return x;
 	}
 
 	@Get('getMeals')
 	async getMeals(@Query() query) {
-		const { limit, date } = query;
-		return this.managerService.getMeals(Number(limit), date);
+		const { limit, date, messName } = query;
+		const x = await this.managerService.getMeals(Number(limit), date, messName);
+		if (x === -1) throw new NotFoundException(`No such mess ${messName}`);
 	}
 
 	@Post('createMealToken')
-	async createMealToken(@Body() body) {
+	async createMealToken(@Body() body, @Req() req: Express.Request) {
 		const { kerberos, meal_id, status } = body;
-		const x = await this.managerService.createMealToken(kerberos, meal_id, status);
-		if (!x) {
-			throw new BadRequestException();
-		}
+		const x = await this.managerService.createMealToken(kerberos, meal_id, status, req.session.user.messNames);
+
+		if (x === -1) throw new NotFoundException('No such user');
+		if (x === -2) throw new NotFoundException('No such meal');
+		if (x === -3) throw new ForbiddenException('Mess not allowed');
+
 		return x;
 	}
 
 	@Post('bulkCreateMealToken')
-	async bulkCreateMealToken(@Body() body) {
+	async bulkCreateMealToken(@Body() body, @Req() req: Express.Request) {
 		const { meal_id, status } = body;
-		const x = await this.managerService.bulkCreateMealToken(meal_id, status);
-		if (!x) {
-			throw new NotFoundException();
-		}
+		const x = await this.managerService.bulkCreateMealToken(meal_id, status, req.session.user.messNames);
+
+		if (x === -1) throw new NotFoundException('No such meal');
+		if (x === -2) throw new ForbiddenException();
+
 		return x;
 	}
 
@@ -139,7 +159,13 @@ export class ManagerController {
 	}
 
 	@Get('getRebates')
-	async getRebates() {
-		return this.managerService.getRebates();
+	async getRebates(@Query() query, @Req() req: Express.Request) {
+		const { messName } = query;
+		if (!req.session.user.messNames.find((d) => d === messName))
+			throw new ForbiddenException(`Manager permissions only for ${req.session.user.messNames}`);
+
+		const x = await this.managerService.getRebates(messName);
+		if (x === -1) throw new NotFoundException('No such mess');
+		return x;
 	}
 }

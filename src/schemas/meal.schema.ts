@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { FoodItem } from './fooditem.schema';
+import { Mess } from './mess.schema';
 
 @Schema()
 export class Meal {
-	@Prop()
-	mess: string;
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: Mess.name })
+	mess_id: Mess;
 
 	@Prop({ default: 'Meal' })
 	name: string;
@@ -23,8 +24,8 @@ export class Meal {
 	price: number;
 
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'FoodItem',
+		type: [mongoose.Schema.Types.ObjectId],
+		ref: FoodItem.name,
 	})
 	fooditem_ids: FoodItem[];
 }

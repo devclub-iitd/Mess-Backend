@@ -6,7 +6,7 @@ import { User } from './user.schema';
 export class AccessToken {
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		ref: User.name,
 		required: true,
 	})
 	user_id: User;

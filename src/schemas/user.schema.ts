@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+import { Mess } from './mess.schema';
 
 @Schema()
 export class User {
@@ -13,6 +15,9 @@ export class User {
 
 	@Prop({ required: true })
 	hostel: string;
+
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: Mess.name })
+	mess_id: Mess;
 
 	@Prop({ required: true })
 	isActive: boolean;
