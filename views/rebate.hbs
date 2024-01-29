@@ -32,6 +32,7 @@
 
 <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
 <script>
+    const messName = document.querySelector("div#messName").innerText.trim();
     const k2E = (kerberos) => `20${kerberos.slice(3,5)}${kerberos.slice(0,3).toUpperCase()}${kerberos.slice(5,9)}`
     const activeNow = (from, to) => new Date(from) < new Date() && new Date(to) > new Date();
  
@@ -62,7 +63,7 @@
 
     function getRebates() {
         document.querySelector('div#rebates').innerHTML = "<div class='spinner-border' role='status'>";
-        fetch("/api/manager/getRebates", { credentials : "include"})
+        fetch("/api/manager/getRebates?messName="+messName, { credentials : "include"})
             .then(response => response.json())
             .then(data => document.querySelector('div#rebates').innerHTML = data.map(
                 r => templateRebateCard(

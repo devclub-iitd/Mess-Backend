@@ -43,17 +43,17 @@
                         <span class="input-group-text">Price</span>
                         <input type="number" value='0' id="create_price" class="form-control" aria-label="Price">
                     </div>
-                    <div class="input-group mb-3">
+                    {{!-- <div class="input-group mb-3">
                         <span class="input-group-text">Mess</span>
                         <select class="form-control" id="create_mess" aria-label="Mess">
                             <option selected value="UDAIGIRI">UDAIGIRI</option>
                             <option value="Others">Others</option>
                         </select>
-                    </div>
+                    </div> --}}
                     <div class="input-group mb-3">
                         <input type="checkbox" checked id="create_all" name="all" value="Auto" class="form-check-input"
                             aria-label="auto">
-                        Auto-Assign to All Users?
+                        Auto-Assign to All Active Users in {{user.messNames[0]}}?
                     </div>
                     <div id="createError"></div>
                 </div>
@@ -66,6 +66,7 @@
     </div>
 </div>
 <script>
+    const messName = document.querySelector("div#messName").innerText.trim();
     function templateMealCard(meal) {
         const start = (new Date(meal.start_time)).toLocaleString();
         const end = (new Date(meal.end_time)).toLocaleString();
@@ -84,15 +85,15 @@
         document.querySelector('div#future_meals').innerHTML = "<div class='spinner-border' role='status'>";
         document.querySelector('div#past_meals').innerHTML = "<div class='spinner-border' role='status'>";
         const d = (new Date()).toString();
-        fetch("/api/manager/getMeals?limit=0", { credentials: "include" }
+        fetch("/manager/getMeals?limit=0&mess="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/api/manager/getMeals?limit=10", { credentials: "include" }
+        fetch("/manager/getMeals?limit=10&mess="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/api/manager/getMeals?limit=-10", { credentials: "include" }
+        fetch("/manager/getMeals?limit=-10&mess="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
@@ -106,12 +107,12 @@
         const e = new Date(document.querySelector('input#create_end').value).toISOString();
         const c = document.querySelector('input#create_capacity').value;
         const p = document.querySelector('input#create_price').value;
-        const m = document.querySelector('select#create_mess').value;
+        // const m = document.querySelector('select#create_mess').value;
         const a = document.querySelector('input#create_all').checked;
-        fetch("/api/manager/createMeal", {
+        fetch("/manager/createMeal", {
             method: 'POST',
             credentials: "include",
-            body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, mess: m }),
+            body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, messName: messName }),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -121,7 +122,7 @@
                 if (a) {
                     const id = (await response.json())['_id'];
                     document.querySelector('div#createError').innerHTML += '<br>Assigning all';
-                    fetch("/api/manager/bulkCreateMealToken", {
+                    fetch("/manager/bulkCreateMealToken", {
                         method: 'POST',
                         credentials: "include",
                         body: JSON.stringify({ meal_id: id }),

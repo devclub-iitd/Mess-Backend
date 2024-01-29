@@ -73,7 +73,7 @@ export class ManagerController {
 
 	@Post('createMeal')
 	async createMeal(@Body() body, @Req() req: Express.Request) {
-		const messName: string = body.mess;
+		const messName: string = body.messName;
 		if (!req.session.user.messNames.find((d) => d === messName))
 			throw new ForbiddenException(`Manager permissions only for ${req.session.user.messNames}`);
 

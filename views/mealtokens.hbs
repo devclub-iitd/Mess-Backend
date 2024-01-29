@@ -61,6 +61,7 @@
 <div class="container" id="mealtokens"></div>
 
 <script>
+    const messName = document.querySelector("div#messName").innerText.trim();
     function mealOption(meal) {
         const start = (new Date(meal.start_time)).toLocaleString();
         const end = (new Date(meal.end_time)).toLocaleString();
@@ -97,21 +98,21 @@
 
     function updateCreateMealOptions() {
         document.querySelector('select#create_meal').innerHTML = '';
-        fetch("/api/manager/getMeals?limit=0", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=0&mess="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#create_meal');
         });
-        fetch("/api/manager/getMeals?limit=10", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=10&mess="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#create_meal');
         });
-        fetch("/api/manager/getUsers", {credentials:"include"}
+        fetch("/api/manager/getUsers?messName="+messName, {credentials:"include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_kerberos').innerHTML = data.map(
@@ -144,28 +145,28 @@
     function updateGetMealOptions() {
         document.querySelector('select#get_meal').innerHTML = '';
         document.querySelector('select#get_kerberos').innerHTML = '';
-        fetch("/api/manager/getMeals?limit=0", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=0&mess="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/api/manager/getMeals?limit=15", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=15&mess="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/api/manager/getMeals?limit=-15", { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=-15&mess="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/api/manager/getUsers", {credentials:"include"}
+        fetch("/api/manager/getUsers?messName="+messName, {credentials:"include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_kerberos').innerHTML = data.map(
