@@ -52,7 +52,7 @@
 				</ul>
 				{{#if user}}
 				<div class="text-white px-4">Logged in as <code>{{user.name}}</code></div>
-				<div id="messName hidden">{{user.messNames[0]}}</div>
+				<div id="messName" class="d-none">{{user.messNames.[0]}}</div>
 				<a class="nav-link" href="/api/web/logout">
 					<button class="btn btn-light">
 						Logout

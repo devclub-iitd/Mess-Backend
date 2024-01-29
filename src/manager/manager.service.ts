@@ -30,11 +30,11 @@ export class ManagerService {
 		@InjectModel(Mess.name) private messModel: Model<MessDocument>,
 	) {}
 
-	async createUser(kerberos: string, name: string, hostel: string, messName: string, adminMesses: string[]) {
+	async createUser(kerberos: string, name: string, hostel: string, messName: string, adminMessNames: string[]) {
 		const check = await this.userModel.findOne({ kerberos: kerberos });
 		if (check) return -1;
 
-		if (messName && !adminMesses.find((d) => d === messName)) return -2;
+		if (messName && !adminMessNames.find((d) => d === messName)) return -2;
 
 		const mess = await this.messModel.findOne({ name: messName }).select('_id');
 		// if null, then no messName was provided, allow for students without assigned mess

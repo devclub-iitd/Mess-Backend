@@ -33,7 +33,7 @@ export class AuthService {
 	}
 
 	async validateAdmin(kerberos: string, password: string): Promise<any> {
-		const admin = await this.adminModel.findOne({ kerberos: kerberos }).populate('messes');
+		const admin = await this.adminModel.findOne({ kerberos: kerberos }).populate('mess_ids');
 		if (admin && (await bcrypt.compare(password, admin.password_hash))) {
 			return {
 				id: admin.id,

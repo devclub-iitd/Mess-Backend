@@ -53,7 +53,7 @@
                     <div class="input-group mb-3">
                         <input type="checkbox" checked id="create_all" name="all" value="Auto" class="form-check-input"
                             aria-label="auto">
-                        Auto-Assign to All Active Users in {{user.messNames[0]}}?
+                        Auto-Assign to All Active Users in {{user.messNames.[0]}}?
                     </div>
                     <div id="createError"></div>
                 </div>
@@ -85,15 +85,15 @@
         document.querySelector('div#future_meals').innerHTML = "<div class='spinner-border' role='status'>";
         document.querySelector('div#past_meals').innerHTML = "<div class='spinner-border' role='status'>";
         const d = (new Date()).toString();
-        fetch("/manager/getMeals?limit=0&mess="+messName, { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=0&messName="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=10&mess="+messName, { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=10&messName="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/manager/getMeals?limit=-10&mess="+messName, { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=-10&messName="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
@@ -109,7 +109,7 @@
         const p = document.querySelector('input#create_price').value;
         // const m = document.querySelector('select#create_mess').value;
         const a = document.querySelector('input#create_all').checked;
-        fetch("/manager/createMeal", {
+        fetch("/api/manager/createMeal", {
             method: 'POST',
             credentials: "include",
             body: JSON.stringify({ name: n, start_time: s, end_time: e, capacity: c, price: p, messName: messName }),
@@ -122,7 +122,7 @@
                 if (a) {
                     const id = (await response.json())['_id'];
                     document.querySelector('div#createError').innerHTML += '<br>Assigning all';
-                    fetch("/manager/bulkCreateMealToken", {
+                    fetch("/api/manager/bulkCreateMealToken", {
                         method: 'POST',
                         credentials: "include",
                         body: JSON.stringify({ meal_id: id }),
