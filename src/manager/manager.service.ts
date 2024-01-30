@@ -118,21 +118,21 @@ export class ManagerService {
 	}
 
 	async getMeals(limit: number, date: Date, messName: string) {
-		const mess = await this.messModel.findOne({ name: messName });
-		if (!mess) return -1;
+		const mess_id = await this.messModel.findOne({ name: messName });
+		if (!mess_id) return -1;
 
 		date = date || new Date();
 		if (limit === 0) {
 			return this.mealModel.find({
 				end_time: { $gt: date },
 				start_time: { $lt: date },
-				mess,
+				mess_id,
 			});
 		} else if (limit > 0) {
-			return this.mealModel.find({ start_time: { $gt: date }, mess }).limit(limit);
+			return this.mealModel.find({ start_time: { $gt: date }, mess_id }).limit(limit);
 		} else {
 			return this.mealModel
-				.find({ end_time: { $lt: date }, mess })
+				.find({ end_time: { $lt: date }, mess_id })
 				.sort({ end_time: -1 })
 				.limit(0 - limit);
 		}
