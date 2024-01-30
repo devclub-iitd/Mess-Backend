@@ -25,10 +25,10 @@
             <div class="input-group mb-3">
                 <span class="input-group-text">Hostel</span>
                 <select class="form-control" id="create_hostel" aria-label="Hostel">
-                    <option selected value="UDAIGIRI">UDAIGIRI</option>
-                    <option value="GIRNAR">GIRNAR</option>
+                    <option selected value="{{user.messNames.[0]}}">{{user.messNames.[0]}}</option>
+                    {{!-- <option value="GIRNAR">GIRNAR</option>
                     <option value="Others">Others</option>
-                    <option value="None">None</option>
+                    <option value="None">None</option> --}}
                 </select>
             </div>
             <div id="createError"></div>
@@ -98,7 +98,7 @@
         fetch("/api/manager/createUser", {
             method: 'POST',
             credentials: "include",
-            body: JSON.stringify({kerberos: k, name: n, hostel: h}),
+            body: JSON.stringify({kerberos: k, name: n, hostel: h, messName: h}),
             headers: {
                 'Content-Type': 'application/json'
             }

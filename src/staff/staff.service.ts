@@ -112,7 +112,10 @@ export class StaffService {
 
 	async useMealToken(id: string, adminMessNames: string[]) {
 		const a = new Date();
-		const doc = await this.mealTokenModel.findById(id).populate('meal_id').populate('meal_id.mess_id');
+		const doc = await this.mealTokenModel.findById(id).populate({
+			path: 'meal_id',
+			populate: { path: 'mess_id' },
+		});
 		const b = new Date();
 		console.log('mealTokenModel.findById(id)', b.valueOf() - a.valueOf());
 
