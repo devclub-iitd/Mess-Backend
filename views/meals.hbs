@@ -34,7 +34,7 @@
                         <input type="datetime-local" step="300" id="create_end" class="form-control"
                             aria-label="EndTime">
                     </div>
-                    <div class="input-group mb-3">
+                    {{!-- <div class="input-group mb-3">
                         <span class="input-group-text">Capacity</span>
                         <input type="number" value='1000' id="create_capacity" class="form-control"
                             aria-label="Capacity">
@@ -42,7 +42,7 @@
                     <div class="input-group mb-3">
                         <span class="input-group-text">Price</span>
                         <input type="number" value='0' id="create_price" class="form-control" aria-label="Price">
-                    </div>
+                    </div> --}}
                     {{!-- <div class="input-group mb-3">
                         <span class="input-group-text">Mess</span>
                         <select class="form-control" id="create_mess" aria-label="Mess">
@@ -72,12 +72,12 @@
         const end = (new Date(meal.end_time)).toLocaleString();
         return `<div class='row bg-light m-2' id='meal_${meal._id}'>
             <div class='col'>${meal.name}</div>
-            <div class='col'>${meal.mess}</div>
+            <div class='col'>${meal.mess_id.name}</div>
             <div class='col'>Start: ${start}</div>
             <div class='col'>End: ${end}</div>
-            <div class='col'>Capacity: ${meal.capacity}</div>
-            <div class='col'>Price: ${meal.price}</div> 
         </div>`;
+           // <div class='col'>Capacity: ${meal.capacity}</div>
+           // <div class='col'>Price: ${meal.price}</div> 
     }
 
     function getMeals() {
@@ -89,11 +89,11 @@
         ).then(response => response.json()
         ).then(data => document.querySelector('div#current_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/api/manager/getMeals?limit=10&messName="+messName, { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=10000&messName="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#future_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
-        fetch("/api/manager/getMeals?limit=-10&messName="+messName, { credentials: "include" }
+        fetch("/api/manager/getMeals?limit=-10000&messName="+messName, { credentials: "include" }
         ).then(response => response.json()
         ).then(data => document.querySelector('div#past_meals').innerHTML = data.map(
             m => templateMealCard(m)).join(''));
@@ -105,8 +105,8 @@
         const n = document.querySelector('input#create_name').value;
         const s = new Date(document.querySelector('input#create_start').value).toISOString();
         const e = new Date(document.querySelector('input#create_end').value).toISOString();
-        const c = document.querySelector('input#create_capacity').value;
-        const p = document.querySelector('input#create_price').value;
+        const c = 1000; // document.querySelector('input#create_capacity').value;
+        const p = 0; // document.querySelector('input#create_price').value;
         // const m = document.querySelector('select#create_mess').value;
         const a = document.querySelector('input#create_all').checked;
         fetch("/api/manager/createMeal", {

@@ -96,6 +96,7 @@ export class ManagerController {
 		const { limit, date, messName } = query;
 		const x = await this.managerService.getMeals(Number(limit), date, messName);
 		if (x === -1) throw new NotFoundException(`No such mess ${messName}`);
+		return x;
 	}
 
 	@Post('createMealToken')

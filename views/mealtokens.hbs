@@ -105,7 +105,7 @@
                 m => mealOption(m)).join('');
             Select2('select#create_meal');
         });
-        fetch("/api/manager/getMeals?limit=10&messName="+messName, { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=10000&messName="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#create_meal').innerHTML += data.map(
@@ -152,14 +152,14 @@
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/api/manager/getMeals?limit=15&messName="+messName, { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=10000&messName="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(
                 m => mealOption(m)).join('');
             Select2('select#get_meal');
         });
-        fetch("/api/manager/getMeals?limit=-15&messName="+messName, { credentials : "include"}
+        fetch("/api/manager/getMeals?limit=-10000&messName="+messName, { credentials : "include"}
             ).then(response => response.json()
         ).then(data => {
             document.querySelector('select#get_meal').innerHTML += data.map(

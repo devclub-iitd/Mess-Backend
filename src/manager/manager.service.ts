@@ -123,18 +123,24 @@ export class ManagerService {
 
 		date = date || new Date();
 		if (limit === 0) {
-			return this.mealModel.find({
-				end_time: { $gt: date },
-				start_time: { $lt: date },
-				mess_id,
-			});
+			return this.mealModel
+				.find({
+					end_time: { $gt: date },
+					start_time: { $lt: date },
+					mess_id,
+				})
+				.populate('mess_id');
 		} else if (limit > 0) {
-			return this.mealModel.find({ start_time: { $gt: date }, mess_id }).limit(limit);
+			return this.mealModel
+				.find({ start_time: { $gt: date }, mess_id })
+				.limit(limit)
+				.populate('mess_id');
 		} else {
 			return this.mealModel
 				.find({ end_time: { $lt: date }, mess_id })
 				.sort({ end_time: -1 })
-				.limit(0 - limit);
+				.limit(0 - limit)
+				.populate('mess_id');
 		}
 	}
 
