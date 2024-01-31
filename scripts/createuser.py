@@ -14,20 +14,28 @@ if r.status_code >= 400:
 print(r)
 print(r.cookies)
 
-for (kerberos, hostel, name) in users:
+for (kerberos, hostel, messName, name) in users:
     r = api.post(
         f"{SERVER}/manager/createUser",
-        json={"kerberos": kerberos, "name": name, "hostel": hostel},
+        json={"kerberos": kerberos, "name": name, "hostel": hostel, "messName": messName},
     )
     if r.status_code >= 400:
         print("ERROR", kerberos, r.text)
-    r = api.post(
-        f"{SERVER}/manager/createAccessToken",
-        json={"kerberos": kerberos},
+    r = api.get(
+        f"{SERVER}/manager/getAccessTokens?kerberos={kerberos}",
     )
-    if r.status_code >= 400:
-        print("ERROR", kerberos, r.text)
-    token = r.json()
+    tokens = r.json()
+    if len(tokens) == 0:
+        r = api.post(
+            f"{SERVER}/manager/createAccessToken",
+            json={"kerberos": kerberos},
+        )
+        if r.status_code >= 400:
+            print("ERROR", kerberos, r.text)
+        token = r.json()
+    else:
+        token = tokens[0]
+        print("[WARNING] Token already exists")
     with open(path("outputs/tokens.csv"), "a") as out:
         out.write(f"{kerberos},{token['token']},{token['created_time']}\n")
     print(token)
