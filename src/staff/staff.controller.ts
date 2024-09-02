@@ -28,7 +28,7 @@ import { generatePath } from 'src/utils/utils';
 @UseGuards(AdminAuthGuard)
 @Controller('staff')
 export class StaffController {
-	constructor(private readonly staffService: StaffService) {}
+	constructor(private readonly staffService: StaffService) { }
 
 	@Get('verifyToken')
 	async verifyToken(@Query() query) {
@@ -73,6 +73,20 @@ export class StaffController {
 		if (x === -1) throw new ForbiddenException('Mess not allowed for this staff');
 		if (x === -2) throw new ForbiddenException('Meal token already used');
 		if (x === -3) throw new ForbiddenException('User is on REBATE');
+
+		return x;
+	}
+
+	@Post('verifyQRCode')
+	async verifyQRCode(@Body() body, @Req() req: Express.Request) {
+		const { kerberos, token } = body;
+		const x = await this.staffService.verifyQRCode(kerberos, token, req.session.user.messNames);
+
+		if (x === 0) throw new NotFoundException('No such user');
+		if (x === -1) throw new NotFoundException('No active meal for this user');
+		if (x === -2) throw new ForbiddenException('Mess not allowed for this staff');
+		if (x === -3) throw new NotFoundException('No meal token for the user');
+		if (x === -4) throw new ForbiddenException('User is on REBATE');
 
 		return x;
 	}

@@ -9,6 +9,7 @@ export class MealToken {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: User.name,
 		required: true,
+		index: true,
 	})
 	user_id: User;
 
@@ -16,6 +17,7 @@ export class MealToken {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: Meal.name,
 		required: true,
+		index: true,
 	})
 	meal_id: Meal;
 

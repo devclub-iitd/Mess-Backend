@@ -15,7 +15,7 @@ export class StaffService {
 		@InjectModel(MealToken.name)
 		private mealTokenModel: Model<MealTokenDocument>,
 		@InjectModel(Meal.name) private mealModel: Model<MealDocument>,
-	) {}
+	) { }
 
 	async verifyToken(kerberos: string, token: string) {
 		const accessTokens = await this.accessTokenModel.aggregate([
@@ -127,6 +127,56 @@ export class StaffService {
 		doc.status = 'USED';
 		doc.enter_time = new Date();
 		return doc.save();
+	}
+
+	async verifyQRCode(kerberos: string, token: string, adminMessNames: string[]) {
+		let st = new Date();
+		const u = await this.accessTokenModel.findOne({ token }).populate('user_id');  // Query 1
+
+		console.log("Query 1 (Get/Verify AccessToken)", new Date().valueOf() - st.valueOf());
+
+		if (!u || u.user_id.kerberos !== kerberos) return 0;
+
+		st = new Date();
+		const m = await this.mealModel.findOne({
+			$and: [{ start_time: { $lt: new Date() } }, { end_time: { $gt: new Date() } }],
+			mess_id: u.user_id.mess_id,
+		}).populate('mess_id');  // Query 2
+
+		console.log("Query 2 (Get/Verify Active Meal)", new Date().valueOf() - st.valueOf());
+
+		if (!m) return -1;
+		if (!adminMessNames.find((d) => d === m.mess_id.name)) return -2;
+
+		st = new Date();
+		const t = await this.mealTokenModel.findOne({ user_id: u.user_id, meal_id: m });  // Query 3
+
+		console.log("Query 3 (Get/Verify MealToken)", new Date().valueOf() - st.valueOf());
+
+		if (!t) return -3;
+		const resp = {
+			name: u.user_id.name,
+			kerberos: u.user_id.kerberos,
+			hostel: u.user_id.hostel,
+			photo: u.user_id.photo,
+			enter_time: t.enter_time,
+			is_scanned_before: t.status === 'USED',
+		}
+		if (t.status === 'REBATE') return -4;
+		if (t.status === 'USED') return resp;
+
+		t.status = 'USED';
+		t.enter_time = new Date();
+
+		st = new Date();
+		await t.save();  // Update 1
+
+		console.log("Update 1 (Mark Meal Token as USED)", new Date().valueOf() - st.valueOf());
+
+		resp.enter_time = t.enter_time;
+
+		return resp;
+
 	}
 
 	async uploadPhoto(kerberos: string, filename: string, adminMessNames: string[]) {

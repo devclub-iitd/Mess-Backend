@@ -5,7 +5,7 @@ import { Mess } from './mess.schema';
 
 @Schema()
 export class Meal {
-	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: Mess.name })
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: Mess.name, index: true })
 	mess_id: Mess;
 
 	@Prop({ default: 'Meal' })
