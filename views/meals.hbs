@@ -66,6 +66,9 @@
     </div>
 </div>
 <script>
+
+    function handleUpdateTime() {}
+
     const messName = document.querySelector("div#messName").innerText.trim();
     function templateMealCard(meal) {
         const start = (new Date(meal.start_time)).toLocaleString();
@@ -75,6 +78,7 @@
             <div class='col'>${meal.mess_id.name}</div>
             <div class='col'>Start: ${start}</div>
             <div class='col'>End: ${end}</div>
+            ${isCurrentMeal && ("<button onclick='handleUpdateTime' class='btn btn-secondary'>Update time</button>")}
         </div>`;
            // <div class='col'>Capacity: ${meal.capacity}</div>
            // <div class='col'>Price: ${meal.price}</div> 

@@ -62,6 +62,29 @@
 </div>
 
 <script>
+
+    function handleDisableQR(kerberos){
+        fetch('/manager/disbaleQR',{
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({kerberos: kerberos}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function(response){
+            console.log(response.statusCode)
+            if(response.statusCode == 200){
+                alert("Success!");
+                window.location.reload();
+            }
+            else{
+                alert("Something went wrong");
+            }
+        }).catch(function(err){
+            alert("Error disabling QR: "+err.message || "Something went wrong" );
+        })
+    }
+
     const messName = document.querySelector("div#messName").innerText.trim();
     function templateUserCard(id, name, hostel, kerberos, isActive) {
         return `<div class='row ${isActive? 'bg-light' : 'bg-danger'} m-2' id='user_${id}'>
@@ -77,6 +100,12 @@
                 >
                     QR
                 </button>
+                ${isActive ? `<button 
+                    class='btn btn-danger' 
+                    onclick="handleDisableQR('${kerberos}');"  
+                >
+                    Disable QR
+                </button>` : ''}
             </div>
         </div>`;
     }

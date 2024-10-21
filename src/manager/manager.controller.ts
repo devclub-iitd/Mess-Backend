@@ -169,4 +169,19 @@ export class ManagerController {
 		if (x === -1) throw new NotFoundException('No such mess');
 		return x;
 	}
+
+	@Post('disableQR')
+	async disableQR(@Body() body, @Req() req: Express.Request) {
+		const { kerberos } = body;
+		const messName = req.session.user.messNames;
+		const x = await this.managerService.disableQR(kerberos, messName);
+
+		if (x === -1) {
+			throw new BadRequestException(`User Not Found`);
+		}
+
+		if (x === -2) {
+			throw new ForbiddenException(`Mess not found for `);
+		}
+	}
 }

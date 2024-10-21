@@ -30,6 +30,16 @@ export class ManagerService {
 		@InjectModel(Mess.name) private messModel: Model<MessDocument>,
 	) {}
 
+	async disableQR(kerberos: string, messName: string[]) {
+		const u = await this.userModel.findOne({ kerberos: kerberos }).select(['_id', 'mess_id']).populate('mess_id');
+		if (!u) return -1;
+
+		if (u.mess_id && !messName.find((d) => u.mess_id.name === d)) return -2;
+
+		u.isActive = false;
+		return u.save();
+	}
+
 	async createUser(kerberos: string, name: string, hostel: string, messName: string, adminMessNames: string[]) {
 		const check = await this.userModel.findOne({ kerberos: kerberos });
 		if (check) return -1;
