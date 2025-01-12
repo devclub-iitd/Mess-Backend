@@ -1,7 +1,10 @@
+import React from "react";
+
 const UserManagement = () => {
-    return(
-        <div></div>
-    )
+  return (
+    <div className="p-6">
+    </div>
+  );
 };
 
 export default UserManagement;
