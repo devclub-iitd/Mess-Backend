@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -15,7 +14,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -403,14 +401,9 @@ const UserManagement = () => {
         isActive:true
       });
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    
-    
 
-
-    // Calculate total pages
     const totalPages = Math.ceil(data.length / rowsPerPage);
 
-    // Paginate data
     const filteredData = data.filter((row) =>
         row.kerberos.toLowerCase().includes(searchQuery.toLowerCase()) ||
         row.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -428,12 +421,12 @@ const UserManagement = () => {
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(event.target.value));
-        setCurrentPage(1); // Reset to first page
+        setCurrentPage(1); 
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1); // Reset to first page on new search
+        setCurrentPage(1); 
     };
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -450,7 +443,7 @@ const UserManagement = () => {
           })
           setIsDialogOpen(false);}
     return (
-        <div className="pl-0 ml-10 pt-6 w-full">
+        <div className="h-full p-6 overflow-auto">
             <header className="flex justify-between">
                 <div>
                     <h1 className="text-xl font-bold">USER MANAGEMENT</h1>
@@ -499,7 +492,7 @@ const UserManagement = () => {
               />
             </div>
 
-            {/* Kerberos ID Field */}
+            
             <div>
               <Label htmlFor="kerberos">Kerberos ID</Label>
               <Input
@@ -511,7 +504,7 @@ const UserManagement = () => {
               />
             </div>
 
-            {/* Hostel Field */}
+            
             <div>
               <Label htmlFor="hostel">Hostel</Label>
               <Input
@@ -542,7 +535,7 @@ const UserManagement = () => {
                         </Button>
                     </div>
                 </div>
-                <div className="m-4">
+                <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -571,7 +564,7 @@ const UserManagement = () => {
                     </Table>
                 </div>
                 <div className="mt-5"><div className="flex flex-col items-center">
-                        {/* <span className="text-gray-500 mr-2">Adju</span> */}
+                        
                         <input
                             type="range"
                             min="1"

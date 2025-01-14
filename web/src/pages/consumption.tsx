@@ -1089,7 +1089,7 @@ const handleRowsPerMealPageChange = (event: React.ChangeEvent<HTMLSelectElement>
 
             {/* Tab Content: Find by Meal */}
             <TabsContent value="meal">
-            <div className="m-4">
+            <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1147,7 +1147,7 @@ const handleRowsPerMealPageChange = (event: React.ChangeEvent<HTMLSelectElement>
 
             {/* Tab Content: Find by User */}
             <TabsContent value="user">
-            <div className="m-4">
+            <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1176,7 +1176,7 @@ const handleRowsPerMealPageChange = (event: React.ChangeEvent<HTMLSelectElement>
                   Showing
                   <select
                     className="mx-2 border border-gray-300 rounded p-1"
-                    value={rowsPerMealPage}
+                    value={rowsPerUserPage}
                     onChange={handleRowsPerUserPageChange}
                   >
                     <option value={3}>3</option>

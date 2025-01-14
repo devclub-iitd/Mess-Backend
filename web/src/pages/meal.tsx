@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { CiCalendar } from "react-icons/ci";
+
 
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -17,7 +16,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -26,10 +24,6 @@ import {
 import { Label } from "@/components/ui/label"
 
 import { CiCirclePlus } from "react-icons/ci";
-import { Checkbox } from "@/components/ui/checkbox"
-
-    
-
 
 import { IoIosNotifications } from "react-icons/io";
 
@@ -270,7 +264,7 @@ const Meal = () => {
         setIsDialogOpen(false);
       };
     return (
-        <div className="pl-0 ml-10 pt-6 w-full">
+        <div className="pl-0 ml-10 pt-6 w-full h-screen overflow-hidden">
           <header className="flex justify-between">
             <div>
               <h1 className="text-xl font-bold">MEALS MANAGEMENT</h1>
@@ -373,7 +367,7 @@ const Meal = () => {
                         </Button>
                 </div>
               </div>
-              <div className="m-4">
+              <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

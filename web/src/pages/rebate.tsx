@@ -210,13 +210,8 @@ const Rebate = () => {
       });
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     
-    
-
-
-    // Calculate total pages
     const totalPages = Math.ceil(data.length / rowsPerPage);
 
-    // Paginate data
     const filteredData = data.filter((row) =>
         row.user_id.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     row.user_id.mess_id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -234,12 +229,12 @@ const Rebate = () => {
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(event.target.value));
-        setCurrentPage(1); // Reset to first page
+        setCurrentPage(1);
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1); // Reset to first page on new search
+        setCurrentPage(1); 
     };
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -280,11 +275,11 @@ const Rebate = () => {
         setIsDialogOpen(false);
       };
     return (
-        <div className="pl-0 ml-10 pt-6 w-full">
+        <div className="pl-0 ml-10 pt-6 w-full h-screen overflow-hidden">
           <header className="flex justify-between">
             <div>
               <h1 className="text-xl font-bold">Rebate</h1>
-              {/* <span className="text-slate-500 mt-3 pt-5">Items Details Information</span> */}
+              
             </div>
             <div>
               <Button className="mr-10">
@@ -406,7 +401,7 @@ const Rebate = () => {
                         </Button>
                 </div>
               </div>
-              <div className="m-4">
+              <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

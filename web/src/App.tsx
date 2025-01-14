@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import Sidebar from "./components/Sidebar";
 import Login from "./pages/login";
 import Dashboard from "./pages//dashboard";
@@ -9,40 +9,38 @@ import Consumption from "./pages/consumption";
 import Rebate from "./pages/rebate";
 
 function App() {
-  // return (
-  //  <Button size={"lg"}>Hello</Button>
-  // )
-  
-  return(
+  return (
     <Router>
-      <div style={{ display: "flex" }}>
-        <SidebarWrapper />
-        {/* Main content */}
-        <div style={{ flex: 1}}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="/meal" element={<Meal />} />
-            <Route path="/consumption" element={<Consumption />} />
-            <Route path="/rebate" element={<Rebate />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/*" element={
+          <ThemeProvider>
+            <ProtectedRoutes />
+          </ThemeProvider>
+        } />
+      </Routes>
     </Router>
-  )
-  
+  );
 }
 
-const SidebarWrapper = () => {
-  const location = useLocation();
-  const hideSidebarRoutes = ["/"]; // Routes where the sidebar is hidden
-  const showSidebar = !hideSidebarRoutes.includes(location.pathname);
-
-  return showSidebar ? <Sidebar /> : null;
+const ProtectedRoutes = () => {
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/meal" element={<Meal />} />
+          <Route path="/consumption" element={<Consumption />} />
+          <Route path="/rebate" element={<Rebate />} />
+        </Routes>
+      </div>
+    </div>
+  );
 };
 
-export default App
+export default App;
 
 
 

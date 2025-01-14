@@ -1,7 +1,9 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
+import { useTheme } from "@/context/ThemeContext";
+import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 
 const Sidebar = () => {
+  const { theme, toggleTheme } = useTheme();
   const menuItems = [
     { name: "Dashboard", path: "/home" },
     { name: "User Management", path: "/user-management" },
@@ -10,10 +12,10 @@ const Sidebar = () => {
     { name: "Rebate", path: "/rebate" },
   ];
 
-  
-
   return (
-    <aside className=" m-4 rounded-lg w-64 bg-orange-100 h-screen p-4 flex flex-col">
+    <aside className="h-full rounded-lg w-64 p-4 flex flex-col
+                      bg-orange-100 dark:bg-gray-800 
+                      text-gray-800 dark:text-gray-200">
       <h2 className="text-2xl font-bold mb-6">Mess Management System</h2>
       <nav className="space-y-4">
         {menuItems.map((item) => (
@@ -22,7 +24,9 @@ const Sidebar = () => {
             to={item.path}
             className={({ isActive }) =>
               `block px-4 py-2 rounded-lg ${
-                isActive ? "bg-orange-200 font-semibold" : "hover:bg-orange-50"
+                isActive 
+                  ? "bg-orange-200 dark:bg-gray-700 font-semibold" 
+                  : "hover:bg-orange-50 dark:hover:bg-gray-700"
               }`
             }
           >
@@ -30,11 +34,28 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
-      <div className="mt-auto flex items-center justify-between px-4">
-        <button className="bg-white py-2 px-4 rounded-lg shadow hover:bg-gray-100">
+      <div className="mt-auto flex items-center gap-2 px-4">
+        <button 
+          onClick={() => theme === 'dark' && toggleTheme()}
+          className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+            ${theme === 'light' 
+              ? 'bg-orange-200 text-gray-800' 
+              : 'bg-white/10 text-gray-400 hover:bg-white/20'
+            }`}
+        >
+          <IoSunnyOutline className="text-lg" />
           Light
         </button>
-        <button className="bg-gray-800 text-white py-2 px-4 rounded-lg shadow hover:bg-gray-700">
+        
+        <button 
+          onClick={() => theme === 'light' && toggleTheme()}
+          className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
+            ${theme === 'dark' 
+              ? 'bg-gray-700 text-gray-200' 
+              : 'bg-gray-200/50 text-gray-600 hover:bg-gray-200'
+            }`}
+        >
+          <IoMoonOutline className="text-lg" />
           Dark
         </button>
       </div>
