@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { CiCalendar } from "react-icons/ci";
 
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -17,7 +15,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -26,12 +23,68 @@ import {
 import { Label } from "@/components/ui/label"
 
 import { CiCirclePlus } from "react-icons/ci";
-import { Checkbox } from "@/components/ui/checkbox"
-
-    
-
 
 import { IoIosNotifications } from "react-icons/io";
+
+import { DataTable } from "@/components/ui/data-table"
+import { ColumnDef } from "@tanstack/react-table"
+import { RefreshCcw } from "lucide-react"
+
+interface RebateData {
+  rebate_application_no: number;
+  user_id: {
+    kerberos: string;
+    name: string;
+  };
+  from_date: string;
+  to_date: string;
+  approval_status: string;
+  reason: string;
+}
+
+const columns: ColumnDef<RebateData>[] = [
+  {
+    accessorKey: "rebate_application_no",
+    header: "Application Number",
+  },
+  {
+    id: "entryNumber",
+    accessorFn: (row) => row.user_id.kerberos,
+    header: "Entry Number",
+    enableSorting: true,
+    filterFn: (row, id, value) => {
+      if (!value) return true;
+      const entryNumber = row.getValue(id) as string;
+      return entryNumber.toLowerCase().includes((value as string).toLowerCase());
+    }
+  },
+  {
+    accessorKey: "user_id.name",
+    header: "Name",
+  },
+  {
+    accessorKey: "from_date",
+    header: "From",
+  },
+  {
+    accessorKey: "to_date",
+    header: "To",
+  },
+  {
+    accessorKey: "approval_status",
+    header: "Approval Status",
+    enableSorting: true,
+    filterFn: (row, id, value) => {
+      if (value === "all") return true;
+      if (!value) return true;
+      return row.getValue(id) === value;
+    }
+  },
+  {
+    accessorKey: "reason",
+    header: "Reason",
+  },
+]
 
 const Rebate = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -209,28 +262,6 @@ const Rebate = () => {
         reason:"",
       });
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    
-    const totalPages = Math.ceil(data.length / rowsPerPage);
-
-    const filteredData = data.filter((row) =>
-        row.user_id.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.user_id.mess_id.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-    );
-
-    const handlePageChange = (newPage: number) => {
-        if (newPage > 0 && newPage <= totalPages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setRowsPerPage(Number(event.target.value));
-        setCurrentPage(1);
-    };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
@@ -275,29 +306,20 @@ const Rebate = () => {
         setIsDialogOpen(false);
       };
     return (
-        <div className="pl-0 ml-10 pt-6 w-full h-screen overflow-hidden">
-          <header className="flex justify-between">
+        <div className="h-screen overflow-hidden">
+          <header className="flex justify-between p-6">
             <div>
               <h1 className="text-xl font-bold">Rebate</h1>
-              
             </div>
             <div>
-              <Button className="mr-10">
+              <Button>
                 <IoIosNotifications />
               </Button>
             </div>
           </header>
-          <div className="border-2 m-8 ml-4 mb-3 rounded-md">
-            <div className="m-10 border-spacing-2">
-              <div className="flex justify-between">
-                <div>
-                  <Input
-                    placeholder="Search Item"
-                    className="w-80 text-green"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  />
-                </div>
+          <div className="border rounded-md mx-6">
+            <div className="p-6">
+              <div className="flex justify-end mb-6">
                 <div className="flex gap-4">
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
@@ -396,70 +418,34 @@ const Rebate = () => {
                     </DialogContent>
                   </Dialog>
                   <Button variant="outline" className="bg-blue-500 text-white">
-                            <CiCirclePlus />
-                            Get Rebate
-                        </Button>
-                </div>
-              </div>
-              <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Application Number</TableHead>
-                      <TableHead>Entry Number</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>From</TableHead>
-                      <TableHead>To</TableHead>
-                      <TableHead>Approval Status</TableHead>
-                      <TableHead>Reason</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.rebate_application_no}</TableCell>
-                        <TableCell>{row.user_id.kerberos}</TableCell>
-                        <TableCell>{row.user_id.name}</TableCell>
-                        <TableCell>{row.from_date}</TableCell>
-                        <TableCell>{row.to_date}</TableCell>
-                        <TableCell>{row.approval_status}</TableCell>
-                        <TableCell>{row.reason}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="flex justify-between mt-4">
-                <div>
-                  Showing
-                  <select
-                    className="mx-2 border border-gray-300 rounded p-1"
-                    value={rowsPerPage}
-                    onChange={handleRowsPerPageChange}
-                  >
-                    <option value={3}>3</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                  </select>
-                  rows per page
-                </div>
-                <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="mx-4">${currentPage} of ${totalPages}</span>
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Refresh
                   </Button>
                 </div>
+              </div>
+              <div className="h-[calc(100vh-300px)]">
+                <DataTable 
+                  columns={columns} 
+                  data={data}
+                  searchableColumns={[
+                    {
+                      id: "entryNumber",
+                      placeholder: "Search by entry number..."
+                    }
+                  ]}
+                  filterableColumns={[
+                    {
+                      id: "approval_status",
+                      title: "Status",
+                      options: [
+                        { label: "All", value: "all" },
+                        { label: "Pending", value: "Pending" },
+                        { label: "Approved", value: "Approved" },
+                        { label: "Rejected", value: "Rejected" }
+                      ]
+                    }
+                  ]}
+                />
               </div>
             </div>
           </div>

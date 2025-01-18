@@ -27,6 +27,47 @@ import { CiCirclePlus } from "react-icons/ci";
 
 import { IoIosNotifications } from "react-icons/io";
 
+import { DataTable } from "@/components/ui/data-table"
+import { ColumnDef } from "@tanstack/react-table"
+import { RefreshCcw } from "lucide-react"
+
+interface Meal {
+  _id: string;
+  name: string;
+  mess_id: {
+    name: string;
+  };
+  start_time: string;
+  end_time: string;
+}
+
+const columns: ColumnDef<Meal>[] = [
+  {
+    accessorKey: "name",
+    header: "Menu",
+    enableSorting: true,
+    enableGlobalFilter: true
+  },
+  {
+    accessorKey: "mess_id.name",
+    header: "Hostel",
+  },
+  {
+    accessorKey: "start_time",
+    header: "Start Time",
+    enableSorting: true,
+    filterFn: (row, id, value) => {
+      const startTime = new Date(row.getValue(id));
+      const filterDate = new Date(value);
+      return startTime.toDateString() === filterDate.toDateString();
+    }
+  },
+  {
+    accessorKey: "end_time",
+    header: "End Time",
+  },
+]
+
 const Meal = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -202,33 +243,6 @@ const Meal = () => {
         end_time: "",
       });
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    
-    
-
-
-    // Calculate total pages
-    const totalPages = Math.ceil(data.length / rowsPerPage);
-
-    // Paginate data
-    const filteredData = data.filter((row) =>
-        row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.mess_id.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-    );
-
-    const handlePageChange = (newPage: number) => {
-        if (newPage > 0 && newPage <= totalPages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setRowsPerPage(Number(event.target.value));
-        setCurrentPage(1); // Reset to first page
-    };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
@@ -264,167 +278,126 @@ const Meal = () => {
         setIsDialogOpen(false);
       };
     return (
-        <div className="pl-0 ml-10 pt-6 w-full h-screen overflow-hidden">
-          <header className="flex justify-between">
-            <div>
-              <h1 className="text-xl font-bold">MEALS MANAGEMENT</h1>
-              <span className="text-slate-500 mt-3 pt-5">Items Details Information</span>
-            </div>
-            <div>
-              <Button className="mr-10">
-                <IoIosNotifications />
-              </Button>
-            </div>
-          </header>
-          <div className="border-2 m-8 ml-4 mb-3 rounded-md">
-            <div className="m-10 border-spacing-2">
-              <div className="flex justify-between">
+        <div className="h-screen overflow-hidden">
+            <header className="flex justify-between p-6">
                 <div>
-                  <Input
-                    placeholder="Search Item"
-                    className="w-80 text-green"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  />
-                </div>
-                <div className="flex gap-4">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        className="bg-green-500 text-white"
-                        onClick={() => setIsDialogOpen(true)}
-                      >
-                        <CiCirclePlus /> Create Meal
-                      </Button>
-                    </DialogTrigger>
-    
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Create New Meal</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="name">Menu Name</Label>
-                          <Input
-                            id="name"
-                            name="name"
-                            placeholder="Enter menu name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-    
-                        {/* <div>
-                          <Label htmlFor="mess_id">Mess Name</Label>
-                          <Input
-                            id="mess_id"
-                            name="mess_id"
-                            placeholder="Enter mess name"
-                            value={formData.mess_id}
-                            onChange={handleInputChange}
-                          />
-                        </div> */}
-    
-                        <div>
-                          <Label htmlFor="start_time">Start Time</Label>
-                          <Input
-                            id="start_time"
-                            name="start_time"
-                            type="datetime-local"
-                            value={formData.start_time}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-    
-                        <div>
-                          <Label htmlFor="end_time">End Time</Label>
-                          <Input
-                            id="end_time"
-                            name="end_time"
-                            type="datetime-local"
-                            value={formData.end_time}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                      </div>
-    
-                      <DialogFooter>
-                        <Button
-                          className="bg-gray-500 text-white"
-                          onClick={() => setIsDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button className="bg-blue-500 text-white" onClick={handleSubmit}>
-                          Submit
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="outline" className="bg-blue-500 text-white">
-                            <CiCirclePlus />
-                            Get User
-                        </Button>
-                </div>
-              </div>
-              <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Menu</TableHead>
-                      <TableHead>Hostel</TableHead>
-                      <TableHead>Start Time</TableHead>
-                      <TableHead>End Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.name}</TableCell>
-                        <TableCell>{row.mess_id.name}</TableCell>
-                        <TableCell>{row.start_time}</TableCell>
-                        <TableCell>{row.end_time}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="flex justify-between mt-4">
-                <div>
-                  Showing
-                  <select
-                    className="mx-2 border border-gray-300 rounded p-1"
-                    value={rowsPerPage}
-                    onChange={handleRowsPerPageChange}
-                  >
-                    <option value={3}>3</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                  </select>
-                  rows per page
+                    <h1 className="text-xl font-bold">MEALS MANAGEMENT</h1>
+                    <span className="text-slate-500 mt-3 pt-5">Items Details Information</span>
                 </div>
                 <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="mx-4">${currentPage} of ${totalPages}</span>
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </Button>
+                    <Button>
+                        <IoIosNotifications />
+                    </Button>
                 </div>
-              </div>
+            </header>
+
+            <div className="border rounded-md mx-6">
+                <div className="p-6 h-[calc(100vh-8rem)]">
+                    <div className="flex justify-end mb-6">
+                        <div className="flex gap-4">
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        className="bg-green-500 text-white"
+                                        onClick={() => setIsDialogOpen(true)}
+                                    >
+                                        <CiCirclePlus /> Create Meal
+                                    </Button>
+                                </DialogTrigger>
+    
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Create New Meal</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="name">Menu Name</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                placeholder="Enter menu name"
+                                                value={formData.name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+    
+                                        {/* <div>
+                                            <Label htmlFor="mess_id">Mess Name</Label>
+                                            <Input
+                                                id="mess_id"
+                                                name="mess_id"
+                                                placeholder="Enter mess name"
+                                                value={formData.mess_id}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div> */}
+    
+                                        <div>
+                                            <Label htmlFor="start_time">Start Time</Label>
+                                            <Input
+                                                id="start_time"
+                                                name="start_time"
+                                                type="datetime-local"
+                                                value={formData.start_time}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+    
+                                        <div>
+                                            <Label htmlFor="end_time">End Time</Label>
+                                            <Input
+                                                id="end_time"
+                                                name="end_time"
+                                                type="datetime-local"
+                                                value={formData.end_time}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    </div>
+    
+                                    <DialogFooter>
+                                        <Button
+                                            className="bg-gray-500 text-white"
+                                            onClick={() => setIsDialogOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button className="bg-blue-500 text-white" onClick={handleSubmit}>
+                                            Submit
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <Button variant="outline" className="bg-blue-500 text-white">
+                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                Refresh
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="h-[calc(100%-4rem)]">
+                        <DataTable 
+                            columns={columns} 
+                            data={data}
+                            searchableColumns={[
+                                {
+                                    id: "name",
+                                    placeholder: "Search by meal..."
+                                }
+                            ]}
+                            filterableColumns={[
+                                {
+                                    id: "start_time",
+                                    title: "Start Time",
+                                    type: "date",
+                                    options: []
+                                }
+                            ]}
+                        />
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      );
-    };
+    );
+};
 
 export default Meal;

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
-import Sidebar from "./components/Sidebar";
+import { Sidebar } from "./components/ui/sidebar";
 import Login from "./pages/login";
 import Dashboard from "./pages//dashboard";
 import UserManagement from "./pages/user_management";
@@ -25,9 +25,9 @@ function App() {
 
 const ProtectedRoutes = () => {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
-      <div className="flex-1 overflow-auto">
+      <main className="flex-1 min-w-0 overflow-auto p-8">
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management" element={<UserManagement />} />
@@ -35,7 +35,7 @@ const ProtectedRoutes = () => {
           <Route path="/consumption" element={<Consumption />} />
           <Route path="/rebate" element={<Rebate />} />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 };

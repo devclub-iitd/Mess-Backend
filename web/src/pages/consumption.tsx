@@ -1,76 +1,87 @@
 import React, { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Input } from "../components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
+import { DataTable } from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { CiCirclePlus } from "react-icons/ci";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface CreateMealModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-const CreateMealModal: React.FC<CreateMealModalProps> = ({ isOpen, onClose}) => {
-  if (!isOpen) return null;
+interface ConsumptionData {
+  _id: string;
+  user_id: {
+    _id: string;
+    kerberos: string;
+    name: string;
+    photo: string;
+    hostel: string;
+    mess_id: string;
+    isActive: boolean;
+    __v: number;
+  };
+  meal_id: {
+    _id: string;
+    mess_id: string;
+    name: string;
+    start_time: string;
+    __v: number;
+  };
+  status: string;
+  __v: number;
+  enter_time?: string | null;
+}
 
-  return (
-    <>
-      {/* Blurred Background */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"></div>
-
-      {/* Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-[400px] shadow-lg">
-          {/* Modal Header */}
-          <h2 className="text-xl font-semibold mb-4">Create meal</h2>
-
-          {/* Name, ID Section */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">NAME, ID</label>
-            <Input
-              placeholder="Enter name and ID"
-              className="w-full"
-            />
-          </div>
-
-          {/* Hostel Dropdown */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">Hostel</label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select store" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hostel1">Hostel 1</SelectItem>
-                <SelectItem value="hostel2">Hostel 2</SelectItem>
-                <SelectItem value="hostel3">Hostel 3</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
-            <Button
-              variant="outline"
-              className="px-4 py-2"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-brown-600 text-white px-6 py-2 rounded-md"
-            >
-              Create
-            </Button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
+const columns: ColumnDef<ConsumptionData>[] = [
+  {
+    id: "name",
+    accessorFn: (row) => row.user_id.name,
+    header: "Name",
+    enableSorting: true,
+    filterFn: (row, id, value) => {
+      if (!value) return true;
+      const name = row.getValue(id) as string;
+      return name.toLowerCase().includes((value as string).toLowerCase());
+    }
+  },
+  {
+    accessorKey: "user_id.kerberos",
+    header: "Entry Number",
+  },
+  {
+    accessorKey: "meal_id.start_time",
+    header: "Date",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    enableSorting: true,
+    filterFn: (row, id, value) => {
+      if (value === "all") return true;
+      if (!value) return true;
+      return row.getValue(id) === value;
+    }
+  },
+  {
+    accessorKey: "enter_time",
+    header: "Entry Time",
+  },
+]
 
 const Consumption = () => {
-    const [searchQuery, setSearchQuery] = useState("");
     const [userdata , setUserData] = useState(
       [
         {
@@ -998,240 +1009,156 @@ const Consumption = () => {
             "__v": 0
         },
         ]);
-    const [currentUserPage, setCurrentUserPage] = useState(1);
-    const [currentMealPage, setCurrentMealPage] = useState(1);
-    const [rowsPerUserPage, setRowsPerUserPage] = useState(10);
-    const [rowsPerMealPage, setRowsPerMealPage] = useState(10);
-    const totalMealPages = Math.ceil(mealdata.length / rowsPerMealPage);
-    const totalUserPages = Math.ceil(userdata.length / rowsPerUserPage)
-    const [isModalOpen, setModalOpen] = useState(false);
-    const paginatedUserData = userdata.slice(
-    (currentUserPage - 1) * rowsPerUserPage,
-    currentUserPage * rowsPerUserPage
-);
-  const paginatedMealData = mealdata.slice(
-    (currentMealPage - 1) * rowsPerMealPage,
-    currentMealPage * rowsPerMealPage
-  );
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        hostel: ""
+    });
 
-const handleUserPageChange = (newPage: number) => {
-    if (newPage > 0 && newPage <= totalUserPages) {
-        setCurrentUserPage(newPage);
-    }
-};
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-const handleMealPageChange = (newPage: number) => {
-  if (newPage > 0 && newPage <= totalMealPages) {
-      setCurrentUserPage(newPage);
-  }
-};
+    const handleSubmit = () => {
+        // Handle form submission
+        setFormData({
+            name: "",
+            hostel: ""
+        });
+        setIsDialogOpen(false);
+    };
 
-const handleRowsPerUserPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerUserPage(Number(event.target.value));
-    setCurrentUserPage(1); // Reset to first page
-};
-
-const handleRowsPerMealPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  setRowsPerMealPage(Number(event.target.value));
-  setCurrentMealPage(1); // Reset to first page
-};
-
-
-// const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     setSearchQuery(event.target.value);
-//     setCurrentPage(1); // Reset to first page on new search
-// };
-  return (
-    <div>
-        <div className="p-6 relative ${isModalOpen ? 'blur-sm' : ''}">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-6">
-            <div>
-            <h1 className="text-2xl font-bold">Consumption</h1>
-            <p className="text-gray-600">Items detail Information</p>
-            </div>
-            <div className="flex items-center gap-4">
-            <Input placeholder="Search..." className="w-60" />
-            <div className="flex items-center gap-2">
-                <img
-                src="https://via.placeholder.com/40"
-                alt="User Avatar"
-                className="w-10 h-10 rounded-full"
-                />
-                <div>
-                <p className="font-medium">Mathias W.</p>
-                <p className="text-sm text-gray-500">Store Manager</p>
+    return (
+        <div>
+            <div className="p-6">
+                {/* Header Section */}
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold">Consumption</h1>
+                        <p className="text-gray-600">Items detail Information</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <img
+                                src="https://via.placeholder.com/40"
+                                alt="User Avatar"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <div>
+                                <p className="font-medium">Mathias W.</p>
+                                <p className="text-sm text-gray-500">Store Manager</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-        </div>
 
-        {/* Create Meal Token Button */}
-        <div className="mb-6">
-            <Button className="bg-green-600 text-white px-6 py-2 rounded-md" onClick={() => setModalOpen(true)}>
-            Create meal token
-            </Button>
-        </div>
+                {/* Create Meal Token Button with Dialog */}
+                <div className="mb-6">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-green-500 text-white">
+                                <CiCirclePlus className="mr-2" /> Create meal token
+                            </Button>
+                        </DialogTrigger>
 
-        {/* Tabs Section */}
-        <Tabs defaultValue="meal">
-            <TabsList className="mb-4 flex justify-center gap-4">
-            <TabsTrigger
-                value="meal"
-                className="px-6 py-2 border-b-2 border-blue-500 text-blue-500"
-            >
-                Find by meal
-            </TabsTrigger>
-            <TabsTrigger value="user" className="px-6 py-2 text-gray-600">
-                Find by user
-            </TabsTrigger>
-            </TabsList>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Create Meal Token</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="name">NAME, ID</Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        placeholder="Enter name and ID"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
 
-            {/* Tab Content: Find by Meal */}
-            <TabsContent value="meal">
-            <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Entry Number</TableHead>
-                      <TableHead>Meal</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedMealData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.user_id.name}</TableCell>
-                        <TableCell>{row.user_id.kerberos}</TableCell>
-                        <TableCell>{row.meal_id.start_time}</TableCell>
-                        <TableCell>{row.status}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="flex justify-between mt-4">
-                <div>
-                  Showing
-                  <select
-                    className="mx-2 border border-gray-300 rounded p-1"
-                    value={rowsPerMealPage}
-                    onChange={handleRowsPerMealPageChange}
-                  >
-                    <option value={3}>3</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                  </select>
-                  rows per page
+                                <div>
+                                    <Label htmlFor="hostel">Hostel</Label>
+                                    <Select onValueChange={(value) => setFormData(prev => ({ ...prev, hostel: value }))}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select hostel" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="VINDHYA">Vindhya</SelectItem>
+                                            <SelectItem value="HIMADRI">Himadri</SelectItem>
+                                            <SelectItem value="KAILASH">Kailash</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsDialogOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSubmit}>
+                                    Create
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-                <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleMealPageChange(currentMealPage - 1)}
-                    disabled={currentMealPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="mx-4">${currentMealPage} of ${totalMealPages}</span>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleMealPageChange(currentMealPage + 1)}
-                    disabled={currentMealPage === totalMealPages}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
 
-            {/* Tab Content: Find by User */}
-            <TabsContent value="user">
-            <div className="m-4 h-[calc(100vh-300px)] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Entry Number</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Entry Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedUserData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{row.user_id.name}</TableCell>
-                        <TableCell>{row.user_id.kerberos}</TableCell>
-                        <TableCell>{row.meal_id.start_time}</TableCell>
-                        <TableCell>{row.status}</TableCell>
-                        <TableCell>{row.enter_time}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="flex justify-between mt-4">
-                <div>
-                  Showing
-                  <select
-                    className="mx-2 border border-gray-300 rounded p-1"
-                    value={rowsPerUserPage}
-                    onChange={handleRowsPerUserPageChange}
-                  >
-                    <option value={3}>3</option>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                  </select>
-                  rows per page
-                </div>
-                <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleUserPageChange(currentUserPage - 1)}
-                    disabled={currentUserPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="mx-4">${currentUserPage} of ${totalUserPages}</span>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleUserPageChange(currentUserPage + 1)}
-                    disabled={currentUserPage === totalUserPages}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-        </Tabs>
+                {/* Tabs Section */}
+                <Tabs defaultValue="meal">
+                    <TabsList className="mb-4 flex justify-center gap-4">
+                    <TabsTrigger
+                        value="meal"
+                        className="px-6 py-2 border-b-2 border-blue-500 text-blue-500"
+                    >
+                        Find by meal
+                    </TabsTrigger>
+                    <TabsTrigger value="user" className="px-6 py-2 text-gray-600">
+                        Find by user
+                    </TabsTrigger>
+                    </TabsList>
 
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-            <div className="text-gray-600">Showing 1 to 10 out of 40 records</div>
-            <div className="flex items-center gap-2">
-            <Button variant="outline" className="w-8 h-8">
-                1
-            </Button>
-            <Button variant="outline" className="w-8 h-8">
-                2
-            </Button>
-            <Button variant="outline" className="w-8 h-8">
-                3
-            </Button>
-            <Button variant="outline" className="w-8 h-8">
-                4
-            </Button>
+                    {/* Tab Content: Find by Meal */}
+                    <TabsContent value="meal">
+                    <div className="h-[calc(100vh-300px)]">
+                      <DataTable columns={columns} data={mealdata} />
+                    </div>
+                    </TabsContent>
+
+                    {/* Tab Content: Find by User */}
+                    <TabsContent value="user">
+                    <div className="h-[calc(100vh-300px)]">
+                      <DataTable 
+                        columns={columns} 
+                        data={userdata}
+                        searchableColumns={[
+                          {
+                            id: "name",
+                            placeholder: "Search by name..."
+                          }
+                        ]}
+                        filterableColumns={[
+                          {
+                            id: "status",
+                            title: "Status",
+                            options: [
+                              { label: "All", value: "all" },
+                              { label: "Booked", value: "BOOKED" },
+                              { label: "Used", value: "USED" }
+                            ]
+                          }
+                        ]}
+                      />
+                    </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
-        </div>
-        <CreateMealModal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-      />
-    </div>
-    
-  );
+    );
 };
 
 export default Consumption;
