@@ -9,4 +9,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": "https://mess-backend-otjk.onrender.com/api/",
+    },
+  }
 })
