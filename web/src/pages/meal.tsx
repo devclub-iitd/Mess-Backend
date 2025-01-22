@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-
+import { PageHeader } from "@/components/ui/page-header"
 
 import {
     Dialog,
@@ -389,17 +389,10 @@ const Meal = () => {
 
     return (
         <div className="h-screen overflow-hidden">
-            <header className="flex justify-between p-6">
-                <div>
-                    <h1 className="text-xl font-bold">MEALS MANAGEMENT</h1>
-                    <span className="text-slate-500 mt-3 pt-5">Items Details Information</span>
-                </div>
-                <div>
-                    <Button>
-                        <IoIosNotifications />
-                    </Button>
-                </div>
-            </header>
+            <PageHeader 
+                title="MEALS MANAGEMENT" 
+                subtitle="Items Details Information" 
+            />
 
             <div className="border rounded-md mx-6">
                 <div className="p-6 h-[calc(100vh-8rem)]">

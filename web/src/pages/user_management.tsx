@@ -17,6 +17,7 @@ import { DataTable } from "@/components/ui/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, RefreshCcw } from "lucide-react"
 import { useUser } from "@/context/UserContext";
+import { PageHeader } from "@/components/ui/page-header"
 
 interface UserData {
     _id: string;
@@ -183,15 +184,10 @@ const UserManagement = () => {
 
     return (
         <div className="h-screen overflow-hidden">
-            <header className="flex justify-between p-6">
-                <div>
-                    <h1 className="text-xl font-bold">USER MANAGEMENT</h1>
-                    <span className="text-slate-500">Items Details Information</span>
-                </div>
-                <div>
-                    <Button className="mr-10"><IoIosNotifications /></Button>
-                </div>
-            </header>
+            <PageHeader 
+                title="USER MANAGEMENT" 
+                subtitle="Items Details Information" 
+            />
 
             <div className="border rounded-lg mx-6">
                 <div className="p-6 h-[calc(100vh-8rem)]">

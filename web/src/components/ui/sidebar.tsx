@@ -1,11 +1,10 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { NavLink } from "react-router-dom"
-import { useTheme } from "@/context/ThemeContext"
-import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5"
+import { NavLink, useNavigate } from "react-router-dom"
 import { Sheet, SheetContent, SheetTrigger } from "./sheet"
-import { Menu, ChevronRight, LayoutDashboard, Users, UtensilsCrossed, BookOpen, FileSpreadsheet } from "lucide-react"
+import { Menu, ChevronRight, LayoutDashboard, Users, UtensilsCrossed, BookOpen, FileSpreadsheet, LogOut } from "lucide-react"
 import { useState } from "react"
+import { useUser } from "@/context/UserContext"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -42,8 +41,14 @@ const SidebarNav = ({ items, className }: { items: NavItem[]; className?: string
 }
 
 const SidebarContent = ({ className }: { className?: string }) => {
-  const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate();
+  const { setUser } = useUser();
   
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/');
+  };
+
   const navItems = [
     {
       title: "Dashboard",
@@ -82,34 +87,28 @@ const SidebarContent = ({ className }: { className?: string }) => {
 
       <SidebarNav items={navItems} />
 
-      <div className="p-6">
-        <div className="flex items-center gap-3">
+      {/* User Info Section */}
+      <div className="mt-auto p-4 border-t">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full"
+            />
+            <div>
+              <p className="font-medium text-gray-800 dark:text-gray-200">Mathias W.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Store Manager</p>
+            </div>
+          </div>
           <Button 
-            variant="ghost"
-            onClick={() => theme === 'dark' && toggleTheme()}
-            className={cn(
-              "flex-1 justify-start py-6 text-base",
-              theme === 'light' 
-                ? 'bg-orange-200 text-gray-800' 
-                : 'bg-white/10 text-gray-400 hover:bg-white/20'
-            )}
+            variant="ghost" 
+            size="icon"
+            onClick={handleLogout}
+            className="hover:bg-red-100 dark:hover:bg-red-900"
           >
-            <IoSunnyOutline className="h-5 w-5 mr-3" />
-            Light
-          </Button>
-          
-          <Button 
-            variant="ghost"
-            onClick={() => theme === 'light' && toggleTheme()}
-            className={cn(
-              "flex-1 justify-start py-6 text-base",
-              theme === 'dark' 
-                ? 'bg-gray-700 text-gray-200' 
-                : 'bg-gray-200/50 text-gray-600 hover:bg-gray-200'
-            )}
-          >
-            <IoMoonOutline className="h-5 w-5 mr-3" />
-            Dark
+            <LogOut className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <span className="sr-only">Logout</span>
           </Button>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/ui/page-header";
 
 interface CreateMealModalProps {
     isOpen: boolean;
@@ -1057,132 +1058,118 @@ const Consumption = () => {
     };
 
     return (
-        <div>
-            <div className="p-6">
-                {/* Header Section */}
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold">Consumption</h1>
-                        <p className="text-gray-600">Items detail Information</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="https://via.placeholder.com/40"
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                            />
-                            <div>
-                                <p className="font-medium">Mathias W.</p>
-                                <p className="text-sm text-gray-500">Store Manager</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div className="h-screen overflow-hidden">
+            <PageHeader 
+                title="CONSUMPTION" 
+                subtitle="Items Details Information" 
+            />
 
-                {/* Create Meal Token Button with Dialog */}
-                <div className="mb-6">
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-green-500 text-white">
-                                <CiCirclePlus className="mr-2" /> Create meal token
-                            </Button>
-                        </DialogTrigger>
+            <div className="border rounded-lg mx-6">
+                <div className="p-6 h-[calc(100vh-8rem)]">
+                    {/* Create Meal Token Button with Dialog */}
+                    <div className="flex justify-end gap-4 mb-4">
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-green-500 text-white">
+                                    <CiCirclePlus className="mr-2" /> Create meal token
+                                </Button>
+                            </DialogTrigger>
 
-                        <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                                <DialogTitle>Create Meal Token</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="name">NAME, ID</Label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        placeholder="Enter name and ID"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                    />
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Create Meal Token</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="name">NAME, ID</Label>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            placeholder="Enter name and ID"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="hostel">Hostel</Label>
+                                        <Select onValueChange={(value) => setFormData(prev => ({ ...prev, hostel: value }))}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select hostel" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="VINDHYA">Vindhya</SelectItem>
+                                                <SelectItem value="HIMADRI">Himadri</SelectItem>
+                                                <SelectItem value="KAILASH">Kailash</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="hostel">Hostel</Label>
-                                    <Select onValueChange={(value) => setFormData(prev => ({ ...prev, hostel: value }))}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select hostel" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="VINDHYA">Vindhya</SelectItem>
-                                            <SelectItem value="HIMADRI">Himadri</SelectItem>
-                                            <SelectItem value="KAILASH">Kailash</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsDialogOpen(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleSubmit}>
+                                        Create
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
+                    {/* Tabs Section */}
+                    <Tabs defaultValue="meal">
+                        <TabsList className="mb-4 flex justify-center gap-4">
+                            <TabsTrigger
+                                value="meal"
+                                className="px-6 py-2 border-b-2 border-blue-500 text-blue-500"
+                            >
+                                Find by meal
+                            </TabsTrigger>
+                            <TabsTrigger value="user" className="px-6 py-2 text-gray-600">
+                                Find by user
+                            </TabsTrigger>
+                        </TabsList>
+
+                        {/* Tab Content: Find by Meal */}
+                        <TabsContent value="meal">
+                            <div className="h-[calc(100vh-300px)]">
+                                <DataTable columns={columns} data={mealdata} />
                             </div>
+                        </TabsContent>
 
-                            <DialogFooter>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setIsDialogOpen(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSubmit}>
-                                    Create
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        {/* Tab Content: Find by User */}
+                        <TabsContent value="user">
+                            <div className="h-[calc(100vh-300px)]">
+                                <DataTable
+                                    columns={columns}
+                                    data={userdata}
+                                    searchableColumns={[
+                                        {
+                                            id: "name",
+                                            placeholder: "Search by name..."
+                                        }
+                                    ]}
+                                    filterableColumns={[
+                                        {
+                                            id: "status",
+                                            title: "Status",
+                                            options: [
+                                                { label: "All", value: "all" },
+                                                { label: "Booked", value: "BOOKED" },
+                                                { label: "Used", value: "USED" }
+                                            ]
+                                        }
+                                    ]}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
-
-                {/* Tabs Section */}
-                <Tabs defaultValue="meal">
-                    <TabsList className="mb-4 flex justify-center gap-4">
-                        <TabsTrigger
-                            value="meal"
-                            className="px-6 py-2 border-b-2 border-blue-500 text-blue-500"
-                        >
-                            Find by meal
-                        </TabsTrigger>
-                        <TabsTrigger value="user" className="px-6 py-2 text-gray-600">
-                            Find by user
-                        </TabsTrigger>
-                    </TabsList>
-
-                    {/* Tab Content: Find by Meal */}
-                    <TabsContent value="meal">
-                        <div className="h-[calc(100vh-300px)]">
-                            <DataTable columns={columns} data={mealdata} />
-                        </div>
-                    </TabsContent>
-
-                    {/* Tab Content: Find by User */}
-                    <TabsContent value="user">
-                        <div className="h-[calc(100vh-300px)]">
-                            <DataTable
-                                columns={columns}
-                                data={userdata}
-                                searchableColumns={[
-                                    {
-                                        id: "name",
-                                        placeholder: "Search by name..."
-                                    }
-                                ]}
-                                filterableColumns={[
-                                    {
-                                        id: "status",
-                                        title: "Status",
-                                        options: [
-                                            { label: "All", value: "all" },
-                                            { label: "Booked", value: "BOOKED" },
-                                            { label: "Used", value: "USED" }
-                                        ]
-                                    }
-                                ]}
-                            />
-                        </div>
-                    </TabsContent>
-                </Tabs>
             </div>
         </div>
     );

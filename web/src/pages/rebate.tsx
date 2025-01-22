@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { PageHeader } from "@/components/ui/page-header";
 
 import {
     Dialog,
@@ -307,150 +308,144 @@ const Rebate = () => {
       };
     return (
         <div className="h-screen overflow-hidden">
-          <header className="flex justify-between p-6">
-            <div>
-              <h1 className="text-xl font-bold">Rebate</h1>
-            </div>
-            <div>
-              <Button>
-                <IoIosNotifications />
-              </Button>
-            </div>
-          </header>
-          <div className="border rounded-md mx-6">
-            <div className="p-6">
-              <div className="flex justify-end mb-6">
-                <div className="flex gap-4">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        className="bg-green-500 text-white"
-                        onClick={() => setIsDialogOpen(true)}
-                      >
-                        <CiCirclePlus /> Create Rebate
-                      </Button>
-                    </DialogTrigger>
-    
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Create New Rebate</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="name">Name</Label>
-                          <Input
-                            id="name"
-                            name="name"
-                            placeholder="Name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                          />
-                        </div>
+            <PageHeader 
+                title="REBATE" 
+                subtitle="Items Details Information" 
+            />
+            <div className="border rounded-md mx-6">
+                <div className="p-6">
+                    <div className="flex justify-end mb-6">
+                        <div className="flex gap-4">
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        className="bg-green-500 text-white"
+                                        onClick={() => setIsDialogOpen(true)}
+                                    >
+                                        <CiCirclePlus /> Create Rebate
+                                    </Button>
+                                </DialogTrigger>
 
-                        <div>
-                          <Label htmlFor="entry_no">Entry Number</Label>
-                          <Input
-                            id="entry_no"
-                            name="entry_no"
-                            placeholder="Entry Number"
-                            value={formData.entry_no}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-    
-                        {/* <div>
-                          <Label htmlFor="mess_id">Mess Name</Label>
-                          <Input
-                            id="mess_id"
-                            name="mess_id"
-                            placeholder="Enter mess name"
-                            value={formData.mess_id}
-                            onChange={handleInputChange}
-                          />
-                        </div> */}
-    
-                        <div>
-                          <Label htmlFor="start_time">From</Label>
-                          <Input
-                            id="start_time"
-                            name="start_time"
-                            type="date"
-                            value={formData.start_time}
-                            onChange={handleInputChange}
-                          />
-                        </div>
-    
-                        <div>
-                          <Label htmlFor="end_time">To</Label>
-                          <Input
-                            id="end_time"
-                            name="end_time"
-                            type="date"
-                            value={formData.end_time}
-                            onChange={handleInputChange}
-                          />
-                        </div>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Create New Rebate</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="name">Name</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                placeholder="Name"
+                                                value={formData.name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
 
-                        <div>
-                          <Label htmlFor="reason">Reason</Label>
-                          <Input
-                            id="reason"
-                            name="reason"
-                            placeholder="Reason"
-                            value={formData.reason}
-                            onChange={handleInputChange}
-                          />
+                                        <div>
+                                            <Label htmlFor="entry_no">Entry Number</Label>
+                                            <Input
+                                                id="entry_no"
+                                                name="entry_no"
+                                                placeholder="Entry Number"
+                                                value={formData.entry_no}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        {/* <div>
+                                            <Label htmlFor="mess_id">Mess Name</Label>
+                                            <Input
+                                                id="mess_id"
+                                                name="mess_id"
+                                                placeholder="Enter mess name"
+                                                value={formData.mess_id}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div> */}
+
+                                        <div>
+                                            <Label htmlFor="start_time">From</Label>
+                                            <Input
+                                                id="start_time"
+                                                name="start_time"
+                                                type="date"
+                                                value={formData.start_time}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="end_time">To</Label>
+                                            <Input
+                                                id="end_time"
+                                                name="end_time"
+                                                type="date"
+                                                value={formData.end_time}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="reason">Reason</Label>
+                                            <Input
+                                                id="reason"
+                                                name="reason"
+                                                placeholder="Reason"
+                                                value={formData.reason}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                        
+                                    </div>
+
+                                    <DialogFooter>
+                                        <Button
+                                            className="bg-gray-500 text-white"
+                                            onClick={() => setIsDialogOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button className="bg-blue-500 text-white" onClick={handleSubmit}>
+                                            Submit
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <Button variant="outline" className="bg-blue-500 text-white">
+                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                Refresh
+                            </Button>
                         </div>
-                        
-                      </div>
-    
-                      <DialogFooter>
-                        <Button
-                          className="bg-gray-500 text-white"
-                          onClick={() => setIsDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button className="bg-blue-500 text-white" onClick={handleSubmit}>
-                          Submit
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="outline" className="bg-blue-500 text-white">
-                    <RefreshCcw className="mr-2 h-4 w-4" />
-                    Refresh
-                  </Button>
+                    </div>
+                    <div className="h-[calc(100vh-300px)]">
+                        <DataTable 
+                            columns={columns} 
+                            data={data}
+                            searchableColumns={[
+                                {
+                                    id: "entryNumber",
+                                    placeholder: "Search by entry number..."
+                                }
+                            ]}
+                            filterableColumns={[
+                                {
+                                    id: "approval_status",
+                                    title: "Status",
+                                    options: [
+                                        { label: "All", value: "all" },
+                                        { label: "Pending", value: "Pending" },
+                                        { label: "Approved", value: "Approved" },
+                                        { label: "Rejected", value: "Rejected" }
+                                    ]
+                                }
+                            ]}
+                        />
+                    </div>
                 </div>
-              </div>
-              <div className="h-[calc(100vh-300px)]">
-                <DataTable 
-                  columns={columns} 
-                  data={data}
-                  searchableColumns={[
-                    {
-                      id: "entryNumber",
-                      placeholder: "Search by entry number..."
-                    }
-                  ]}
-                  filterableColumns={[
-                    {
-                      id: "approval_status",
-                      title: "Status",
-                      options: [
-                        { label: "All", value: "all" },
-                        { label: "Pending", value: "Pending" },
-                        { label: "Approved", value: "Approved" },
-                        { label: "Rejected", value: "Rejected" }
-                      ]
-                    }
-                  ]}
-                />
-              </div>
             </div>
-          </div>
         </div>
-      );
-    };
+    );
+};
 
 export default Rebate;
