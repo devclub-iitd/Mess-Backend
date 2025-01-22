@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 import {
@@ -10,7 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog"
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -30,48 +30,60 @@ import { IoIosNotifications } from "react-icons/io";
 import { DataTable } from "@/components/ui/data-table"
 import { ColumnDef } from "@tanstack/react-table"
 import { RefreshCcw } from "lucide-react"
+import { useUser } from "@/context/UserContext";
 
 interface Meal {
-  _id: string;
-  name: string;
-  mess_id: {
+    _id: string;
     name: string;
-  };
-  start_time: string;
-  end_time: string;
+    mess_id: {
+        name: string;
+    };
+    start_time: string;
+    end_time: string;
 }
 
 const columns: ColumnDef<Meal>[] = [
-  {
-    accessorKey: "name",
-    header: "Menu",
-    enableSorting: true,
-    enableGlobalFilter: true
-  },
-  {
-    accessorKey: "mess_id.name",
-    header: "Hostel",
-  },
-  {
-    accessorKey: "start_time",
-    header: "Start Time",
-    enableSorting: true,
-    filterFn: (row, id, value) => {
-      const startTime = new Date(row.getValue(id));
-      const filterDate = new Date(value);
-      return startTime.toDateString() === filterDate.toDateString();
-    }
-  },
-  {
-    accessorKey: "end_time",
-    header: "End Time",
-  },
+    {
+        accessorKey: "name",
+        header: "Menu",
+        enableSorting: true,
+        enableGlobalFilter: true
+    },
+    {
+        accessorKey: "mess_id.name",
+        header: "Hostel",
+    },
+    {
+        accessorKey: "start_time",
+        header: "Start Time",
+        enableSorting: true,
+        filterFn: (row, id, value) => {
+            const startTime = new Date(row.getValue(id));
+            const filterDate = new Date(value);
+            return startTime.toDateString() === filterDate.toDateString();
+        }
+    },
+    {
+        accessorKey: "end_time",
+        header: "End Time",
+    },
 ]
 
 const Meal = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
+    const [currentMeals, setCurrentMeals] = useState<Meal[]>([]);
+    const [futureMeals, setFutureMeals] = useState<Meal[]>([]);
+    const [pastMeals, setPastMeals] = useState<Meal[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [name, setName] = useState("");
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [capacity, setCapacity] = useState(1000); // default capacity
+    const [price, setPrice] = useState(0); // default price
+    const [assignToAll, setAssignToAll] = useState(false);
+    const [message, setMessage] = useState("");
     const [data, setData] = useState(
         [
             {
@@ -234,14 +246,54 @@ const Meal = () => {
                 "fooditem_ids": [],
                 "__v": 0
             }
-    
-    
-    ]);
+
+
+        ]);
+
+    const { user } = useUser();
+
+    const fetchMeals = async () => {
+        try {
+            setIsLoading(true);
+            // Fetch current meals
+            const currentResponse = await fetch(
+                `/api/manager/getMeals?limit=0&messName=${user!.messNames[0]}`,
+                { credentials: "include" }
+            );
+            const currentData: Meal[] = await currentResponse.json();
+            setCurrentMeals(currentData);
+
+            // Fetch future meals
+            const futureResponse = await fetch(
+                `/api/manager/getMeals?limit=10000&messName=${user!.messNames[0]}`,
+                { credentials: "include" }
+            );
+            const futureData: Meal[] = await futureResponse.json();
+            setFutureMeals(futureData);
+
+            // Fetch past meals
+            const pastResponse = await fetch(
+                `/api/manager/getMeals?limit=-10000&messName=${user!.messNames[0]}`,
+                { credentials: "include" }
+            );
+            const pastData: Meal[] = await pastResponse.json();
+            setPastMeals(pastData);
+        } catch (error) {
+            console.error("Error fetching meals:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchMeals();
+    }, []);
+
     const [formData, setFormData] = useState({
         name: "",
         start_time: "",
         end_time: "",
-      });
+    });
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,32 +303,90 @@ const Meal = () => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-      };
-      const handleSubmit = () => {
+    };
+    const handleCreateMeal = async () => {
+        const { user } = useUser();
+        const messName = user!.messNames[0];
+        try {
+            const response = await fetch("/api/manager/createMeal", {
+                method: "POST",
+                credentials: "include",
+                body: JSON.stringify({
+                    name,
+                    start_time: startTime,
+                    end_time: endTime,
+                    capacity,
+                    price,
+                    messName,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status === 201) {
+                setMessage("Meal Successfully Created!");
+                if (assignToAll) {
+                    const result = await response.json();
+                    const mealId = result["_id"];
+                    setMessage((prev) => `${prev}\nAssigning to all users...`);
+
+                    const bulkResponse = await fetch("/api/manager/bulkCreateMealToken", {
+                        method: "POST",
+                        credentials: "include",
+                        body: JSON.stringify({ meal_id: mealId }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (bulkResponse.status === 201) {
+                        setMessage((prev) => `${prev}\nAssigned to all users!`);
+                    } else {
+                        const bulkError = await bulkResponse.text();
+                        setMessage((prev) => `${prev}\n${bulkError}`);
+                    }
+                }
+            } else {
+                const errorText = await response.text();
+                setMessage(errorText);
+            }
+        } catch (error) {
+            setMessage("An error occurred while creating the meal.");
+            console.error(error);
+        }
+    };
+
+    const handleSubmit = () => {
+        setName(formData.name);
+        setStartTime(formData.start_time);
+        setEndTime(formData.end_time);
+        handleCreateMeal();
         const newItem = {
-          _id: uuidv4(),
-          name: formData.name,
-          mess_id: {
             _id: uuidv4(),
-            name: "VINDHYA",
-            "capacity": 1000,
-                    "__v": 0
-          },
-          start_time: formData.start_time,
-          end_time: formData.end_time,
-          capacity: 1000,
-          price: 0,
-          fooditem_ids: [],
-          __v: 0,
+            name: formData.name,
+            mess_id: {
+                _id: uuidv4(),
+                name: "VINDHYA",
+                "capacity": 1000,
+                "__v": 0
+            },
+            start_time: formData.start_time,
+            end_time: formData.end_time,
+            capacity: 1000,
+            price: 0,
+            fooditem_ids: [],
+            __v: 0,
         };
         setData((prevData) => [...prevData, newItem]);
         setFormData({
-          name: "",
-          start_time: "",
-          end_time: "",
+            name: "",
+            start_time: "",
+            end_time: "",
         });
         setIsDialogOpen(false);
-      };
+    };
+
     return (
         <div className="h-screen overflow-hidden">
             <header className="flex justify-between p-6">
@@ -304,7 +414,7 @@ const Meal = () => {
                                         <CiCirclePlus /> Create Meal
                                     </Button>
                                 </DialogTrigger>
-    
+
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
                                         <DialogTitle>Create New Meal</DialogTitle>
@@ -320,7 +430,7 @@ const Meal = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-    
+
                                         {/* <div>
                                             <Label htmlFor="mess_id">Mess Name</Label>
                                             <Input
@@ -331,7 +441,7 @@ const Meal = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div> */}
-    
+
                                         <div>
                                             <Label htmlFor="start_time">Start Time</Label>
                                             <Input
@@ -342,7 +452,7 @@ const Meal = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-    
+
                                         <div>
                                             <Label htmlFor="end_time">End Time</Label>
                                             <Input
@@ -354,7 +464,7 @@ const Meal = () => {
                                             />
                                         </div>
                                     </div>
-    
+
                                     <DialogFooter>
                                         <Button
                                             className="bg-gray-500 text-white"
@@ -368,15 +478,15 @@ const Meal = () => {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                            <Button variant="outline" className="bg-blue-500 text-white">
+                            <Button variant="outline" className="bg-blue-500 text-white" onClick={fetchMeals}>
                                 <RefreshCcw className="mr-2 h-4 w-4" />
                                 Refresh
                             </Button>
                         </div>
                     </div>
                     <div className="h-[calc(100%-4rem)]">
-                        <DataTable 
-                            columns={columns} 
+                        <DataTable
+                            columns={columns}
                             data={data}
                             searchableColumns={[
                                 {

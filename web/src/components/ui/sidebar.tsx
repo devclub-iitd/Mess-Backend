@@ -48,7 +48,7 @@ const SidebarContent = ({ className }: { className?: string }) => {
     {
       title: "Dashboard",
       icon: <LayoutDashboard className="h-4 w-4" />,
-      path: "/home"
+      path: "/dashboard"
     },
     {
       title: "User Management",

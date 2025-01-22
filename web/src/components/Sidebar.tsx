@@ -5,7 +5,7 @@ import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 const Sidebar = () => {
   const { theme, toggleTheme } = useTheme();
   const menuItems = [
-    { name: "Dashboard", path: "/home" },
+    { name: "Dashboard", path: "/dashboard" },
     { name: "User Management", path: "/user-management" },
     { name: "Meals", path: "/meal" },
     { name: "Consumption", path: "/consumption" },

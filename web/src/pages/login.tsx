@@ -1,11 +1,45 @@
+import { useUser } from "@/context/UserContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [kerberos, setKerberos] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const handleClick = () => {
-    navigate('/home');  // Navigate to a new route
+  const {setUser} = useUser();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ kerberos, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 201) {
+        const userData = await response.json();
+        setUser(userData);
+        const redirectUrl = window.location.href.split("?next=")[1];
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate("/dashboard");
+        }
+      } else {
+        const errorMessage = await response.text();
+        setError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("An error occurred. Please try again.");
+    }
   };
 
+  
   return (
     <div className="flex h-screen font-sans">
       {/* Left Section with the Image */}
@@ -32,7 +66,7 @@ const Login = () => {
             Welcome <span className="ml-2">👋</span>
             </h2>
             <p className="text-gray-600 text-sm mb-6">Please login here</p>
-            <form className="w-full max-w-sm">
+            <form onSubmit={handleSubmit} className="w-full max-w-sm">
             {/* Kerberos ID */}
             <div className="mb-4">
                 <label
@@ -42,8 +76,10 @@ const Login = () => {
                 Kerberos ID
                 </label>
                 <input
-                type="email"
+                type="text"
                 id="kerberos-id"
+                value={kerberos}
+                onChange={(e) => setKerberos(e.target.value)}
                 placeholder="mathew.west@ienetworksolutions.com"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
                 required
@@ -61,6 +97,8 @@ const Login = () => {
                 <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="********"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
                 required
@@ -92,7 +130,7 @@ const Login = () => {
 
             {/* Submit Button */}
             <button
-                type="submit" onClick={handleClick}
+                type="submit"
                 className="w-full py-2 px-4 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400"
             >
                 Login With Kerberos

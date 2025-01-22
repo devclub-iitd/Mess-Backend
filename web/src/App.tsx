@@ -19,11 +19,11 @@ function App() {
             <Route path="/" element={
                 <ProtectedRoutes />
               } >
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="/meal" element={<Meal />} />
-            <Route path="/consumption" element={<Consumption />} />
-            <Route path="/rebate" element={<Rebate />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/meal" element={<Meal />} />
+              <Route path="/consumption" element={<Consumption />} />
+              <Route path="/rebate" element={<Rebate />} />
             </Route>
           </Routes>
         </Router>
@@ -41,12 +41,15 @@ const ProtectedRoutes = () => {
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <main className="flex-1 min-w-0 overflow-auto p-8">
-        <Routes>
+        <>
           <Outlet/>
-        </Routes>
+        </>
       </main>
     </div>
   );
 };
 
 export default App;
+
+
+
