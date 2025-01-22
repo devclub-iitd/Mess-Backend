@@ -81,6 +81,13 @@ export function DataTable<TData>({
     },
   })
 
+  const getSelectedFilterLabel = (columnId: string, options: { label: string; value: string }[]) => {
+    const currentFilter = table.getColumn(columnId)?.getFilterValue() as string;
+    if (!currentFilter || currentFilter === 'all') return 'All';
+    const selectedOption = options.find(opt => opt.value === currentFilter);
+    return selectedOption ? selectedOption.label : 'All';
+  };
+
   return (
     <div>
       <div className="flex items-center gap-4 py-4">
@@ -99,7 +106,7 @@ export function DataTable<TData>({
           <DropdownMenu key={id}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
-                {title} {table.getColumn(id)?.getFilterValue() ? '✓' : ''}
+                {type === "date" ? title : getSelectedFilterLabel(id, options)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
