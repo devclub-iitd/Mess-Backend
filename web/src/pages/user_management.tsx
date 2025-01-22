@@ -43,6 +43,11 @@ const columns: ColumnDef<UserData>[] = [
         },
         enableSorting: true,
         enableHiding: false,
+        filterFn: (row, id, value) => {
+            if (!value) return true;
+            const name = row.getValue(id) as string;
+            return name.toLowerCase().includes((value as string).toLowerCase());
+        }
     },
     {
         accessorKey: "kerberos",
@@ -55,6 +60,11 @@ const columns: ColumnDef<UserData>[] = [
             )
         },
         enableSorting: true,
+        filterFn: (row, id, value) => {
+            if (!value) return true;
+            const kerberos = row.getValue(id) as string;
+            return kerberos.toLowerCase().includes((value as string).toLowerCase());
+        }
     },
     {
         accessorKey: "hostel",
@@ -265,6 +275,10 @@ const UserManagement = () => {
                                 {
                                     id: "name",
                                     placeholder: "Search by name..."
+                                },
+                                {
+                                    id: "kerberos",
+                                    placeholder: "Search by entry number..."
                                 }
                             ]}
                             filterableColumns={[
