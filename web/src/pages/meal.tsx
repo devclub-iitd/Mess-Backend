@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/page-header"
-
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
     Dialog,
     DialogContent,
@@ -387,6 +387,31 @@ const Meal = () => {
         setIsDialogOpen(false);
     };
 
+    // Function to categorize meals
+    const categorizeMeals = (meals: Meal[]) => {
+        const now = new Date();
+        const pastMeals: Meal[] = [];
+        const presentMeals: Meal[] = [];
+        const futureMeals: Meal[] = [];
+
+        meals.forEach(meal => {
+            const startTime = new Date(meal.start_time);
+            const endTime = new Date(meal.end_time);
+
+            if (endTime < now) {
+                pastMeals.push(meal);
+            } else if (startTime > now) {
+                futureMeals.push(meal);
+            } else {
+                presentMeals.push(meal);
+            }
+        });
+
+        return { pastMeals, presentMeals, futureMeals };
+    };
+
+    const { pastMeals: categorizedPastMeals, presentMeals: categorizedPresentMeals, futureMeals: categorizedFutureMeals } = categorizeMeals(data);
+
     return (
         <div className="h-screen overflow-hidden">
             <PageHeader 
@@ -477,26 +502,83 @@ const Meal = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className="h-[calc(100%-4rem)]">
-                        <DataTable
-                            columns={columns}
-                            data={data}
-                            searchableColumns={[
-                                {
-                                    id: "name",
-                                    placeholder: "Search by meal..."
-                                }
-                            ]}
-                            filterableColumns={[
-                                {
-                                    id: "start_time",
-                                    title: "Start Time",
-                                    type: "date",
-                                    options: []
-                                }
-                            ]}
-                        />
-                    </div>
+
+                    <Tabs defaultValue="present">
+                        <TabsList className="mb-4">
+                            <TabsTrigger value="present">Present Meals</TabsTrigger>
+                            <TabsTrigger value="past">Past Meals</TabsTrigger>
+                            <TabsTrigger value="future">Future Meals</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="present">
+                            <div className="h-[calc(100vh-300px)]">
+                                <DataTable
+                                    columns={columns}
+                                    data={categorizedPresentMeals}
+                                    searchableColumns={[
+                                        {
+                                            id: "name",
+                                            placeholder: "Search by meal..."
+                                        }
+                                    ]}
+                                    filterableColumns={[
+                                        {
+                                            id: "start_time",
+                                            title: "Start Time",
+                                            type: "date",
+                                            options: []
+                                        }
+                                    ]}
+                                />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="past">
+                            <div className="h-[calc(100vh-300px)]">
+                                <DataTable
+                                    columns={columns}
+                                    data={categorizedPastMeals}
+                                    searchableColumns={[
+                                        {
+                                            id: "name",
+                                            placeholder: "Search by meal..."
+                                        }
+                                    ]}
+                                    filterableColumns={[
+                                        {
+                                            id: "start_time",
+                                            title: "Start Time",
+                                            type: "date",
+                                            options: []
+                                        }
+                                    ]}
+                                />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="future">
+                            <div className="h-[calc(100vh-300px)]">
+                                <DataTable
+                                    columns={columns}
+                                    data={categorizedFutureMeals}
+                                    searchableColumns={[
+                                        {
+                                            id: "name",
+                                            placeholder: "Search by meal..."
+                                        }
+                                    ]}
+                                    filterableColumns={[
+                                        {
+                                            id: "start_time",
+                                            title: "Start Time",
+                                            type: "date",
+                                            options: []
+                                        }
+                                    ]}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             </div>
         </div>
