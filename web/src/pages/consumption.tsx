@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/ui/page-header";
+import { RefreshCcw } from "lucide-react";
 
 interface CreateMealModalProps {
     isOpen: boolean;
@@ -1057,118 +1058,118 @@ const Consumption = () => {
         setIsDialogOpen(false);
     };
 
+    const fetchMeals = async () => {
+        try {
+            const response = await fetch("/api/manager/fetchMeals", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                setUserData(data);
+                setMealData(data);
+            } else {
+                const errorText = await response.text();
+                console.log(errorText);
+            }
+        } catch (error) {
+            console.log("An error occurred while fetching meals.");
+            console.error(error);
+        }
+    };
+
     return (
-        <div className="h-screen overflow-hidden">
+        <div className="flex-1 overflow-auto">
             <PageHeader 
                 title="CONSUMPTION" 
                 subtitle="Items Details Information" 
             />
 
-            <div className="border rounded-lg mx-6">
-                <div className="p-6 h-[calc(100vh-8rem)]">
-                    {/* Create Meal Token Button with Dialog */}
-                    <div className="flex justify-end gap-4 mb-4">
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-green-500 text-white">
-                                    <CiCirclePlus className="mr-2" /> Create meal token
-                                </Button>
-                            </DialogTrigger>
+            <div className="border rounded-md mx-6">
+                <div className="p-6">
+                    <div className="flex justify-end mb-6">
+                        <div className="flex gap-4">
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-green-500 text-white">
+                                        <CiCirclePlus className="mr-2" /> Create meal token
+                                    </Button>
+                                </DialogTrigger>
 
-                            <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle>Create Meal Token</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div>
-                                        <Label htmlFor="name">NAME, ID</Label>
-                                        <Input
-                                            id="name"
-                                            name="name"
-                                            placeholder="Enter name and ID"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                        />
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Create Meal Token</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="name">NAME, ID</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                placeholder="Enter name and ID"
+                                                value={formData.name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="hostel">Hostel</Label>
+                                            <Select onValueChange={(value) => setFormData(prev => ({ ...prev, hostel: value }))}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select hostel" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="VINDHYA">Vindhya</SelectItem>
+                                                    <SelectItem value="HIMADRI">Himadri</SelectItem>
+                                                    <SelectItem value="KAILASH">Kailash</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <Label htmlFor="hostel">Hostel</Label>
-                                        <Select onValueChange={(value) => setFormData(prev => ({ ...prev, hostel: value }))}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select hostel" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="VINDHYA">Vindhya</SelectItem>
-                                                <SelectItem value="HIMADRI">Himadri</SelectItem>
-                                                <SelectItem value="KAILASH">Kailash</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setIsDialogOpen(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleSubmit}>
-                                        Create
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsDialogOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleSubmit}>
+                                            Create
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <Button variant="outline" className="bg-blue-500 text-white" onClick={fetchMeals}>
+                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                Refresh
+                            </Button>
+                        </div>
                     </div>
 
-                    {/* Tabs Section */}
-                    <Tabs defaultValue="meal">
-                        <TabsList className="mb-4 flex justify-center gap-4">
-                            <TabsTrigger
-                                value="meal"
-                                className="px-6 py-2 border-b-2 border-blue-500 text-blue-500"
-                            >
-                                Find by meal
-                            </TabsTrigger>
-                            <TabsTrigger value="user" className="px-6 py-2 text-gray-600">
-                                Find by user
-                            </TabsTrigger>
-                        </TabsList>
-
-                        {/* Tab Content: Find by Meal */}
-                        <TabsContent value="meal">
-                            <div className="h-[calc(100vh-300px)]">
-                                <DataTable columns={columns} data={mealdata} />
-                            </div>
-                        </TabsContent>
-
-                        {/* Tab Content: Find by User */}
-                        <TabsContent value="user">
-                            <div className="h-[calc(100vh-300px)]">
-                                <DataTable
-                                    columns={columns}
-                                    data={userdata}
-                                    searchableColumns={[
-                                        {
-                                            id: "name",
-                                            placeholder: "Search by name..."
-                                        }
-                                    ]}
-                                    filterableColumns={[
-                                        {
-                                            id: "status",
-                                            title: "Status",
-                                            options: [
-                                                { label: "All", value: "all" },
-                                                { label: "Booked", value: "BOOKED" },
-                                                { label: "Used", value: "USED" }
-                                            ]
-                                        }
-                                    ]}
-                                />
-                            </div>
-                        </TabsContent>
-                    </Tabs>
+                    <div>
+                        <DataTable
+                            columns={columns}
+                            data={userdata}
+                            searchableColumns={[
+                                {
+                                    id: "user_id.kerberos",
+                                    placeholder: "Search by kerberos..."
+                                }
+                            ]}
+                            filterableColumns={[
+                                {
+                                    id: "status",
+                                    title: "Status",
+                                    options: [
+                                        { label: "Booked", value: "BOOKED" },
+                                        { label: "Used", value: "USED" },
+                                    ]
+                                }
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

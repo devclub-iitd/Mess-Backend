@@ -193,92 +193,90 @@ const UserManagement = () => {
     }
 
     return (
-        <div className="h-screen overflow-hidden">
+        <div className="flex-1 overflow-auto">
             <PageHeader 
                 title="USER MANAGEMENT" 
                 subtitle="Items Details Information" 
             />
 
-            <div className="border rounded-lg mx-6">
-                <div className="p-6 h-[calc(100vh-8rem)]">
-                    <div className="flex justify-end gap-4 mb-4">
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-green-500 text-white" onClick={() => setIsDialogOpen(true)}>
-                                    <CiCirclePlus className="mr-2" /> Create User
-                                </Button>
-                            </DialogTrigger>
-
-                            <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle>Create New User</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div>
-                                        <Label htmlFor="name">Name</Label>
-                                        <Input
-                                            id="name"
-                                            name="name"
-                                            placeholder="Enter name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="kerberos">Kerberos ID</Label>
-                                        <Input
-                                            id="kerberos"
-                                            name="kerberos"
-                                            placeholder="Enter Kerberos ID"
-                                            value={formData.kerberos}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="hostel">Hostel</Label>
-                                        <Input
-                                            id="hostel"
-                                            name="hostel"
-                                            placeholder="Enter hostel"
-                                            value={formData.hostel}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </div>
-
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setIsDialogOpen(false)}
-                                    >
-                                        Cancel
+            <div className="border rounded-md mx-6">
+                <div className="p-6">
+                    <div className="flex justify-end mb-6">
+                        <div className="flex gap-4">
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="bg-green-500 text-white" onClick={() => setIsDialogOpen(true)}>
+                                        <CiCirclePlus className="mr-2" /> Create User
                                     </Button>
-                                    <Button onClick={handleSubmit}>
-                                        Submit
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                        <Button variant="outline" className="bg-blue-500 text-white">
-                            <RefreshCcw className="mr-2 h-4 w-4" />
-                            Refresh
-                        </Button>
+                                </DialogTrigger>
+
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Create New User</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor="name">Name</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                placeholder="Enter name"
+                                                value={formData.name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="kerberos">Kerberos ID</Label>
+                                            <Input
+                                                id="kerberos"
+                                                name="kerberos"
+                                                placeholder="Enter Kerberos ID"
+                                                value={formData.kerberos}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="hostel">Hostel</Label>
+                                            <Input
+                                                id="hostel"
+                                                name="hostel"
+                                                placeholder="Enter hostel"
+                                                value={formData.hostel}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsDialogOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleSubmit}>
+                                            Submit
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <Button variant="outline" className="bg-blue-500 text-white" onClick={getUsers}>
+                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                Refresh
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="h-[calc(100%-4rem)]">
+                    <div>
                         <DataTable
                             columns={columns}
                             data={data}
                             searchableColumns={[
                                 {
-                                    id: "name",
-                                    placeholder: "Search by name..."
-                                },
-                                {
                                     id: "kerberos",
-                                    placeholder: "Search by entry number..."
+                                    placeholder: "Search by kerberos..."
                                 }
                             ]}
                             filterableColumns={[
@@ -286,7 +284,6 @@ const UserManagement = () => {
                                     id: "isActive",
                                     title: "Status",
                                     options: [
-                                        { label: "All", value: "all" },
                                         { label: "Active", value: "true" },
                                         { label: "Inactive", value: "false" }
                                     ]

@@ -413,14 +413,14 @@ const Meal = () => {
     const { pastMeals: categorizedPastMeals, presentMeals: categorizedPresentMeals, futureMeals: categorizedFutureMeals } = categorizeMeals(data);
 
     return (
-        <div className="h-screen overflow-hidden">
+        <div className="flex-1 overflow-auto">
             <PageHeader 
                 title="MEALS MANAGEMENT" 
                 subtitle="Items Details Information" 
             />
 
             <div className="border rounded-md mx-6">
-                <div className="p-6 h-[calc(100vh-8rem)]">
+                <div className="p-6">
                     <div className="flex justify-end mb-6">
                         <div className="flex gap-4">
                             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -511,7 +511,7 @@ const Meal = () => {
                         </TabsList>
 
                         <TabsContent value="present">
-                            <div className="h-[calc(100vh-300px)]">
+                            <div>
                                 <DataTable
                                     columns={columns}
                                     data={categorizedPresentMeals}
@@ -534,7 +534,7 @@ const Meal = () => {
                         </TabsContent>
 
                         <TabsContent value="past">
-                            <div className="h-[calc(100vh-300px)]">
+                            <div>
                                 <DataTable
                                     columns={columns}
                                     data={categorizedPastMeals}
@@ -557,7 +557,7 @@ const Meal = () => {
                         </TabsContent>
 
                         <TabsContent value="future">
-                            <div className="h-[calc(100vh-300px)]">
+                            <div>
                                 <DataTable
                                     columns={columns}
                                     data={categorizedFutureMeals}
